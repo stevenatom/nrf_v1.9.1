@@ -1,0 +1,34 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>Analyzing Source Code</title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+    <meta content="RAL PrepHTML" name="GENERATOR"/>
+    
+    
+    <link rel="STYLESHEET" type="text/css" href="./rwt/styles/ses-default.css"/>
+    <link rel="STYLESHEET" type="text/css" href="./rwt/styles/ses.css"/>
+    <link rel="STYLESHEET" type="text/css" href="./rwt/styles/rwt-doc-page.css"/>
+    <link rel="STYLESHEET" type="text/css" href="./rwt/styles/theme.css"/>
+    <script type="text/javascript" language="javascript" src="./rwt/scripts/jquery-latest.js"><!--><-->
+</script>
+    <script type="text/javascript" language="javascript" src="./rwt/scripts/rwt.js"><!--><-->
+</script>
+    <script type="text/javascript" language="javascript" src="./rwt/scripts/rwt-doc-page.js"><!--><-->
+</script>
+    
+  </head>
+
+  <body>
+    <div id="rwt-content">
+      
+<p>The <b>Analyze</b> action is available on the context menu of the project explorer at project, folder and file level. The analyze action will run the
+<a href="https://clang.llvm.org/extra/clang-tidy">https://clang.llvm.org/extra/clang-tidy</a> linter tool on the C/C++ files selected by the project explorer node and display warnings in the
+output window. The default checks will be the same as the clang analyzer. You can enable additional checks by setting 
+the <b>Clang Tidy Checks</b> project option. For example you can enable the bugprone code constructs check and disable a specific clang analyzer 
+diagnostic check as follows</p>
+<pre class="rwt-code">bugprone-*
+-clang-diagnostic-parentheses-equality</pre><p>You can also set the project option <b>Analyze After Compile</b> which will run the analyzer each time the compiler is run.</p> 
+    </div>
+  </body>
+</html>

@@ -1,0 +1,65 @@
+projects:
+
+  - group: Getting Started
+    select: checked
+    
+  - group: Getting Started | nRF
+    select: hide
+    path:   
+      - nrf/samples/bluetooth/peripheral_lbs
+
+  - group: Getting Started | Zephyr
+    select: hide
+    path:   
+      - zephyr/samples/basic/bluetooth/peripheral_hr
+      - zephyr/samples/basic
+      - zephyr/samples/hello_world
+
+
+  - group: Short Range
+    select: checked
+  
+  - group: Short Range | Bluetooth Applications
+    select: hide
+    path:   
+      - nrf/applications/nrf_desktop
+
+  - group: Short Range | Bluetooth
+    select: hide
+    path:   
+      - zephyr/samples/bluetooth
+   
+  - group: Short Range | Zigbee
+    select: hide
+    path:   
+      - nrf/samples/zigbee
+
+  - group: Short Range | Thread
+    select: hide
+    path:   
+      - nrf/samples/openthread
+
+
+  - group: Cellular
+    select: checked
+
+  - group: Cellular | nRF9160
+    select: hide
+    path: 
+      - nrf/samples/nrf9160
+      - nrf/applications
+    omit:     
+      - nrf_desktop
+
+  - group: Drivers / Peripheral
+
+  - group: Drivers / Peripheral | nfc
+    select: hide
+    path:   
+      - nrf/samples/nfc 
+
+  - group: Other Nordic Projects
+    path:  
+      - nrf
+
+

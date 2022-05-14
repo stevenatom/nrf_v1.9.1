@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Types>
+
+  <List Name="array&lt;*,*&gt;"
+        Head="&amp;$(E).__elems_"
+        Data="(*($(T0)*)CURRENT)"
+        Length="$(T1)"
+        Next="CURRENT+sizeof($(T0))"/>
+
+  <Expr Name="container_type"
+        Expr="$(E).c"/>
+
+  <List Name="deque&lt;*,*&gt;"
+        Length="$(E).__size_.__value_"
+        Head="(*$(E).__map_.__first_)+$(E).__start_"
+        Data="*(($(T0)*)CURRENT)"
+        Next="CURRENT+sizeof($(T0))"/>
+
+  <Expr Name="__deque_iterator&lt;*,*,*,*,*,*&gt;"
+        Expr="*$(E).__ptr_"/>
+
+  <Expr Name="reverse_iterator&lt;*&gt;"
+        Expr="$(E).current"/>
+
+  <Expr Name="__wrap_iter&lt;*&gt;"
+        Expr="*($(E).__i)"/>
+
+  <Expr Name="iterator&lt;*,*,*,*,*&gt;"
+        Expr="$(E).current"/>
+
+  <Expr Name="const_iterator"
+        Expr="*($(E)._M_current)"/>
+
+  <Expr Name="reverse_iterator"
+        Expr="*($(E).current._M_current)"/>
+
+  <Expr Name="__normal_iterator&lt;*,*&gt;"
+        Expr="*($(E)._M_current)"/>
+
+  <List Name="forward_list&lt;*,*&gt;"
+        Condition="HEAD!=CURRENT"
+        Head="(*(__forward_list_node&lt;$(T0), void *&gt;*)HEAD).__next_"                
+        Data="(*(__forward_list_node&lt;$(T0), void *&gt;*)CURRENT).__value_"
+        Next="(*(__forward_list_node&lt;$(T0), void *&gt;*)CURRENT).__next_"/>
+
+  <Expr Name="__forward_list_iterator&lt;*&gt;"
+        Expr="(*($(T0)*)HEAD).__value_"/>
+
+  <Expr Name="__forward_list_const_iterator&lt;*&gt;"
+        Expr="(*($(T0)*)HEAD).__value_"/>
+
+  <List Name="list&lt;*,*&gt;"
+        Condition="HEAD!=CURRENT"
+        Head="(*(__list_node_base&lt;$(T0), void *&gt;*)HEAD).__next_"        
+        Data="*($(T0)*)(CURRENT+sizeof(__list_node_base&lt;$(T0), void*&gt;))"
+        Next="(*(__list_node_base&lt;$(T0), void *&gt;*)CURRENT).__next_"/>
+
+  <Expr Name="__list_iterator&lt;*,*&gt;"
+        Expr="*($(T0)*)(((unsigned char *)$(E).__ptr_)+sizeof(__list_node_base&lt;$(T0), void*&gt;))"/>
+
+  <Expr Name="__list_const_iterator&lt;*,*&gt;"
+        Expr="*($(T0)*)(((unsigned char *)$(E).__ptr_)+sizeof(__list_node_base&lt;$(T0), void*&gt;))"/>
+
+  <RBTree Name="map&lt;*,*,*,*&gt;"
+        Condition="HEAD!=CURRENT"
+        Length="(unsigned)$(E).__tree_.__pair3_"
+        Head="(unsigned *)$(E).__tree_.__begin_node_"
+        Data="*(std::__1::pair&lt;$(T0) const, $(T1) &gt;*)(CURRENT+sizeof(__tree_node_base<void*>))"
+        Left="((__tree_node_base<void*>*)CURRENT).__left_"
+        Right="((__tree_node_base<void*>*)CURRENT).__right_"
+        Parent="((__tree_node_base<void*>*)CURRENT).__parent_"/>
+
+  <Expr Name="__map_iterator&lt;*&gt;"
+        Expr="$(E).__i_"/>
+
+  <Expr Name="__map_const_iterator&lt;*&gt;"
+        Expr="$(E).__i_"/>
+
+  <Expr Name="priority_queue&lt;*,*,*&gt;"
+        Expr="$(E).c"/>
+
+  <Expr Name="queue&lt;*,*&gt;"
+        Expr="$(E).c"/>
+
+  <Expr Name="__tree_iterator&lt;*,*,*&gt;"
+        Expr="*(($(T0)*)((unsigned char *)($(E).__ptr_)+sizeof(__tree_node_base<void*>)))"/>
+
+  <Expr Name="__tree_const_iterator&lt;*,*,*&gt;"
+        Expr="*(($(T0)*)((unsigned char *)($(E).__ptr_)+sizeof(__tree_node_base<void*>)))"/>
+
+  <RBTree Name="set&lt;*,*,*&gt;"
+        Condition="HEAD!=CURRENT"
+        Length="(unsigned)$(E).__tree_.__pair3_"
+        Head="(unsigned *)$(E).__tree_.__begin_node_"
+        Data="*($(T0)*)(CURRENT+sizeof(__tree_node_base<void*>))"
+        Left="((__tree_node_base<void*>*)CURRENT).__left_"
+        Right="((__tree_node_base<void*>*)CURRENT).__right_"
+        Parent="((__tree_node_base<void*>*)CURRENT).__parent_"/>
+
+  <String Name="basic_string&lt;char,*,*&gt;"
+        Condition="(($(T)*)HEAD).__r_.__value_.__l.__cap_ & 1"
+        Data="*(char*)((($(T)*)HEAD).__r_.__value_.__l.__data_)"
+        Else="(char*)(($(T)*)HEAD).__r_.__value_.__s.__data_"/>
+
+  <List Name="vector&lt;*,*&gt;"
+        Condition="((__vector_base&lt;$(T0), $(T1) &gt;*)HEAD).__end_!=CURRENT"
+        Head="((__vector_base&lt;$(T0), $(T1) &gt;*)HEAD).__begin_"
+        Data="(*($(T0)*)CURRENT)"
+        Next="CURRENT+sizeof($(T0))"/>
+
+  <Tuple Name="pair2&lt;*,*&gt;"
+         first="(*($(T)*)HEAD).first"
+         second="(*($(T)*)HEAD).second"/>
+
+  <Tuple Name="tuple&lt;*,*&gt;"
+         first="(*($(T)*)HEAD).__base_::__tuple_leaf&lt;0, $(T0), false&gt;.__value_"
+         second="(*($(T)*)HEAD).__base_::__tuple_leaf&lt;1, $(T1), false&gt;.__value_" />
+
+  <Tuple Name="tuple&lt;*,*,*&gt;"
+         first="(*($(T)*)HEAD).__base_::__tuple_leaf&lt;0, $(T0), false&gt;.__value_"
+         second="(*($(T)*)HEAD).__base_::__tuple_leaf&lt;1, $(T1), false&gt;.__value_"
+         third="(*($(T)*)HEAD).__base_::__tuple_leaf&lt;2, $(T2), false&gt;.__value_" />
+
+  <Tuple Name="tuple&lt;*,*,*,*&gt;"
+         first="(*($(T)*)HEAD).__base_::__tuple_leaf&lt;0, $(T0), false&gt;.__value_"
+         second="(*($(T)*)HEAD).__base_::__tuple_leaf&lt;1, $(T1), false&gt;.__value_"
+         third="(*($(T)*)HEAD).__base_::__tuple_leaf&lt;2, $(T2), false&gt;.__value_"
+         fourth="(*($(T)*)HEAD).__base_::__tuple_leaf&lt;3, $(T3), false&gt;.__value_"/>
+
+  <Expr Name="value_type*"
+        Expr="*($(E))"/>
+
+  <Expr Name="const value_type*"
+        Expr="*($(E))"/>
+
+  <!--
+  <List Name="VeryBasicArray&lt;*&gt;"
+        Head="(($(T)*)HEAD).m_pData"
+        Data="(*($(T0)*)CURRENT)"
+        Length="(($(T)*)HEAD).m_Count"
+        Next="CURRENT+sizeof($(T0))"/>
+
+  <List Name="List&lt;*,*&gt;"
+        Head="&amp;(($(T)*)HEAD).m_buffer[(($(T)*)HEAD).m_firstNodeIndex]"
+        Data="((node*)CURRENT).target"
+        Length="(($(T)*)HEAD).m_count"
+        Next="&amp;(($(T)*)HEAD).m_buffer[((node*)CURRENT).nextNode]"/>
+  -->
+
+</Types>

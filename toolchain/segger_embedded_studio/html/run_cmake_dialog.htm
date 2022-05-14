@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SEGGER Embedded Studio</title>
+    <link rel="stylesheet" href="rwt/styles/w3.css"/>
+    <link rel="stylesheet" href="rwt/styles/font-awesome.min.css"/>
+    <link rel="stylesheet" href="styles/studio.css"/>
+    <link rel="stylesheet" href="styles/nordic.css"/>
+    <script src="rwt/scripts/jquery-latest.js" > </script>
+    <script src="scripts/studio.js" > </script>
+    <script src="scripts/nordic.js" > </script>
+    <script>
+
+
+$(document).ready(function() {
+  studio.setBusy(true);
+  $(".w3-input, .w3-btn, .w3-check").addClass("w3-disabled");
+
+  var zephyrBase = studio.getSolutionAttribute("source_directory");
+  var boardDirectory = studio.getSolutionAttribute("board_directory");
+  var buildDirectory = studio.getSolutionAttribute("build_directory");
+  var cmakelists = studio.getSolutionAttribute("cmakelists_file_name");
+  var gnuArmEmbToolchainDir = studio.getSolutionAttribute("gnuarmemb_toolchain_directory");
+  var boardName = studio.getSolutionAttribute("board_name");
+  var cmakeExecutable = studio.getSolutionAttribute("cmake_command");
+  var studioDir = studio.getSystemMacro("StudioDir");
+
+  if (zephyrBase == "" || boardDirectory == "" || buildDirectory == "")
+    throw "Current project is not a Zephyr project";
+
+  try
+    {
+      NORDIC_reloadCMakeProject(zephyrBase,
+                                gnuArmEmbToolchainDir,
+                                cmakeExecutable,
+                                studioDir,
+                                buildDirectory,
+                                boardDirectory,
+                                boardName,
+                                cmakelists
+      );
+    }
+  catch(err)
+    {
+      studio.showErrorMessageBox("Cannot reload CMake project", err + ".");
+      studio.closeWindow(0);
+    }
+
+  studio.closeWindow(1);
+});
+
+    </script>
+  </head>
+
+  <body>
+    <div class="header w3-light-blue">
+      <span>
+        <img style="padding-right: 10px" src="images/nRFConnectLogo.png" align="left" />
+        <div style="padding-top: 10px">
+          <div class="w3-text-white w3-xlarge">Running CMake</div>
+          <div class="breadcrumb"></div>
+        </div>
+      </span>
+    </div>
+
+    <div class="main w3-white">
+    </div>
+
+    <div class="footer w3-light-grey">
+    </div>
+
+  </body>
+</html>

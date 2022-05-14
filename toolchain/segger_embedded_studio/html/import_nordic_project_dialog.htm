@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SEGGER Embedded Studio</title>
+    <link rel="stylesheet" href="rwt/styles/w3.css"/>
+    <link rel="stylesheet" href="rwt/styles/font-awesome.min.css"/>
+    <link rel="stylesheet" href="rwt/styles/theme.css"/>
+    <link rel="stylesheet" href="styles/studio.css"/>
+    <link rel="stylesheet" href="styles/nordic.css"/>
+    <style type="text/css">
+
+input.w3-input
+{
+  outline: none;
+}
+
+    </style>
+    <script src="rwt/scripts/jquery-latest.js" > </script>
+    <script src="scripts/studio.js" > </script>
+    <script src="scripts/nordic.js" > </script>
+    <script>
+
+var manual_boards_list = [];
+var lastSelectedBoardName = "";
+
+var toolchain = {"ncs_toolchain_version":"",
+                 "ncs_toolchain_cmake":studio.getEnvironmentSetting("Nordic/CMakeExecutable"),
+                 "ncs_toolchain_ninja":studio.getEnvironmentSetting("Nordic/NinjaExecutable"),
+                 "ncs_toolchain_python":studio.getEnvironmentSetting("Nordic/PythonExecutable"),
+                 "ncs_toolchain_gnuarmemb_path":NORDIC_fixPath(studio.getEnvironmentSetting("Nordic/ToolchainDir")),
+                 "ncs_toolchain_dtc":studio.getEnvironmentSetting("Nordic/DTCExecutable")
+}
+
+function basename(path)
+{
+  var index = path.lastIndexOf('/');
+  if (index >= 0) {
+    path = path.substr(index + 1);
+  }
+  return path;
+}
+
+function dirname(path)
+{
+  var index = path.lastIndexOf('/');
+  if (index >= 0) {
+    path = path.substr(0, index);
+  }
+  return path;
+}
+
+function createProject()
+{
+  var selectedToolchain = document.getElementById("ncsToolchain").value;
+  var selectedRelease = document.getElementById("ncsRelease").value;
+  var buildDir = NORDIC_fixPath(document.getElementById("buildDir").value);
+
+  var boardId = document.getElementById("boardName").value;
+  var board = boardData(boardId);
+  var boardDir = board.path
+  var boardName = board.name
+
+  if(!boardName) {
+    alert("No board selected, please select a board.");
+    return;
+  }
+
+  if(!buildDir) {
+    alert("No build directory given, please specify a build directory.");
+    return;
+  }
+
+  studio.setBusy(true);
+  $(".w3-input, .w3-btn, .w3-check").addClass("w3-disabled");
+
+  var sourceDir =  getFullPath(document.getElementById("projects").value);
+  var cmakelists = sourceDir + "/CMakeLists.txt";
+
+  var zephyr = releases.ncs_releases[selectedRelease].zephyr_base;
+
+  studio.setUserSetting("ARM/Zephyr/CMakeLists", cmakelists);
+  studio.setUserSetting("ARM/Zephyr/BuildDir", document.getElementById("buildDir").value);
+  studio.setUserSetting("ARM/Zephyr/BoardDir", document.getElementById("boardDir").value);
+
+  if (selectedToolchain != "NONE") {
+    for (var i = 0; i < releases.ncs_toolchains.length; i++) {
+      if (releases.ncs_toolchains[i].ncs_toolchain_version == selectedToolchain) {
+        toolchain = releases.ncs_toolchains[i];
+      }
+    }
+  }
+
+  try {
+    NORDIC_createProject(
+      zephyr,
+      toolchain,
+      studio.getSystemMacro("StudioDir"), 
+      NORDIC_fixPath(document.getElementById("buildDir").value), 
+      boardDir,
+      boardName,
+      cmakelists,
+      document.getElementById("cmakeOptions").value,
+      document.getElementById("deleteBuildDir").value
+    )
+  }
+  catch(err) {
+    studio.activateAction("FocusOutputWindow");
+    studio.showErrorMessageBox("Cannot create project", err + ".");
+    studio.closeWindow(0);
+  }
+
+  studio.closeWindow(1);
+}
+
+function browse(caption, id, isDirNotFile, filter)
+{
+  var path = document.getElementById(id).value;
+  if (path == "") {
+    path = studio.getEnvironmentSetting("Nordic/ZephyrBase");
+  }
+  if (isDirNotFile) {
+    path = studio.browseExistingDirectory(caption, path);
+  }
+  else {
+    path = studio.browseExistingFileName(caption, path, filter);
+  }
+  if (path) {
+    var element = document.getElementById(id);
+    var newValue = NORDIC_fixPath(path);
+    if (element.value != newValue) {
+      element.value = newValue;
+    }
+    document.getElementById(id).value = NORDIC_fixPath(path);
+  }
+}
+
+function browseBoard(caption)
+{
+  var path = "";
+
+  var selectedRelease = document.getElementById("ncsRelease").value;
+  var zephyr = releases.ncs_releases[selectedRelease].zephyr_base;
+
+  if (zephyr == "") {
+    zephyr = studio.getEnvironmentSetting("Nordic/ZephyrBase");
+  }
+  path = studio.browseExistingDirectory(caption, zephyr);
+
+
+  if (path) {
+    var newBoardPath = NORDIC_fixPath(path);
+
+    var files = studio.getDirectoryList(newBoardPath, "*_defconfig");
+    for (var i = 0; i < files.length; i++)
+    {
+      manual_board = {"name":files[i].slice(0, -10),
+                      "path":newBoardPath};
+      manual_boards_list.push(manual_board);
+    }
+
+    updateBoardNameOptions(lastSelectedBoardName);
+
+    newBoardValue = 3000 + manual_boards_list.length - 1;
+    var element = document.getElementById("boardName");
+    element.value = newBoardValue;
+    element.onchange();
+  }
+}
+
+function updateBuildDirectory()
+{
+  var project = document.getElementById("projects").value;
+  var selectedRelease = document.getElementById("ncsRelease").value;
+  var buildDirElement = document.getElementById("buildDir");
+
+  var boardId = document.getElementById("boardName").value;
+
+  var board = boardData(boardId);
+
+  sourceDir = getFullPath(project);
+  if (sourceDir == "" || board.name == "") {
+    buildDirElement.value = "";
+  }
+  else {
+    buildDirElement.value = sourceDir + "/build_" + board.name;
+  }
+}
+
+function updateNcsToolchain()
+{
+  var selectedRelease = document.getElementById("ncsRelease").value;
+  var toolchainElement = document.getElementById("ncsToolchain");
+
+  var options = "";
+  for (var i = 0; i < releases.ncs_releases[selectedRelease].ncs_toolchain_comp_list.length; i++) {
+    if (releases.ncs_releases[selectedRelease].ncs_toolchain_preferred == releases.ncs_releases[selectedRelease].ncs_toolchain_comp_list[i].toolchain_version) {
+      options += '<option selected="selected">' + releases.ncs_releases[selectedRelease].ncs_toolchain_comp_list[i].toolchain_version + "</option>";
+    }
+    else {
+      options += '<option>' + releases.ncs_releases[selectedRelease].ncs_toolchain_comp_list[i].toolchain_version + "</option>";
+    }
+  }
+  options += '<option value="NONE">NONE (Use SES settings / environment PATH)</option>';
+  toolchainElement.innerHTML = options;
+
+  updateBoardNameOptions(lastSelectedBoardName);
+  findProjects();
+  showGroupSelectors();
+  updateProjectListDisplay();
+}
+
+function updateNcsReleases()
+{
+  var ncsReleaseElement = document.getElementById("ncsRelease");
+
+  var options = "";
+  for (var i = 0; i < releases.ncs_releases.length; i++) {
+    options += '<option value="' + i + '">'
+               + releases.ncs_releases[i].ncs_version +
+               " (" + releases.ncs_releases[i].ncs_path + ")"
+               + "</option>";
+  }
+  ncsReleaseElement.innerHTML = options;
+}
+
+function boardData(id) {
+  var boardDir = "";
+  var boardName = "";
+  var selectedRelease = document.getElementById("ncsRelease").value;
+
+  if(id < 1000) {
+    boardDir = releases.ncs_releases[selectedRelease].thingy_boards_list[id].path;
+    boardName = releases.ncs_releases[selectedRelease].thingy_boards_list[id].name;
+  }
+  else if(id < 2000) {
+    boardDir = releases.ncs_releases[selectedRelease].nordic_boards_list[id - 1000].path;
+    boardName = releases.ncs_releases[selectedRelease].nordic_boards_list[id - 1000].name;
+  }
+  else if(id < 3000) {
+    boardDir = releases.ncs_releases[selectedRelease].other_boards_list[id - 2000].path;
+    boardName = releases.ncs_releases[selectedRelease].other_boards_list[id - 2000].name;
+  }
+  else if(id < 4000) {
+    boardDir = manual_boards_list[id - 3000].path;
+    boardName = manual_boards_list[id - 3000].name;
+  }
+
+  return {"name":boardName,"path":boardDir};
+}
+
+function addBoardNameOptions(offset, list, select)
+{
+  var options = "";
+
+  for (var i = 0; i < list.length; i++) {
+    boardName = list[i].name;
+    boardId = offset + i;
+    if(boardName == select) {
+      options += '<option value="' + boardId + '" selected>' + boardName + "</option>";
+    }
+    else {
+      options += '<option value="' + boardId + '">' + boardName + "</option>";
+    }
+  }
+  return options;
+}
+
+function updateBoardGroupOptions(boardGroupdName, boardList, checked)
+{
+  var boardGroupElement = document.getElementById(boardGroupdName);
+  if (boardList.length == 0) {
+    boardGroupElement.checked = false;
+    boardGroupElement.disabled = true;
+  }
+  else if (boardGroupElement.disabled){
+    boardGroupElement.checked = checked;
+    boardGroupElement.disabled = false;
+  }
+}
+
+function updateBoardNameOptions(currentBoardName)
+{
+  var boardNameElement = document.getElementById("boardName");
+  var boardDirElement = document.getElementById("boardDir");
+
+  var selectedRelease = document.getElementById("ncsRelease").value;
+  var toolchainElement = document.getElementById("ncsToolchain");
+
+  updateBoardGroupOptions("boards_thingy", releases.ncs_releases[selectedRelease].thingy_boards_list, true);
+  updateBoardGroupOptions("boards_nordic", releases.ncs_releases[selectedRelease].nordic_boards_list, true);
+  updateBoardGroupOptions("boards_others", releases.ncs_releases[selectedRelease].other_boards_list, false);
+
+  var options = "";
+  if (manual_boards_list.length > 0) {
+    options += '<option disabled>---- Manually added boards ----</option>';
+    options += addBoardNameOptions(3000, manual_boards_list, currentBoardName);
+  }
+
+  if (document.getElementById("boards_thingy").value) {
+    options += '<option disabled>---- Thingy ----</option>';
+    options += addBoardNameOptions(0, releases.ncs_releases[selectedRelease].thingy_boards_list, currentBoardName);
+  }
+
+  if (document.getElementById("boards_nordic").value) {
+    options += '<option disabled>---- Nordic kits ----</option>';
+    options += addBoardNameOptions(1000, releases.ncs_releases[selectedRelease].nordic_boards_list, currentBoardName);
+  }
+
+  if (document.getElementById("boards_others").value) {
+    options += '<option disabled>---- 3rd party kits ----</option>';
+    options += addBoardNameOptions(2000, releases.ncs_releases[selectedRelease].other_boards_list, currentBoardName);
+  }
+
+  if (options == "") {
+    options += '<option disabled>---- Please select a board group or manually add a board ----</option>';
+  }
+
+  boardNameElement.innerHTML = options;
+  updateBuildDirectory();
+}
+
+function selectBoard(id)
+{
+  lastSelectedBoardName = boardData(id).name;
+  updateBuildDirectory();
+}
+
+// functions for displaying the project list
+
+var addedProjects = [];
+var selectedDir = "";
+
+function toggleGroup(prefix, groupname) 
+{
+  var selected = document.getElementById(prefix + groupname).value;
+  if (selected) {
+    for (var i = 0; i < projGroups.length; i++) {
+      if (projGroups[i].name == groupname) {
+        if (selected == "on") {
+          projGroups[i].selected = "checked";
+        }
+        else {
+          projGroups[i].selected = "";
+        }
+        break;
+      }
+    }
+  }
+  updateProjectListDisplay();
+}
+
+function showGroupSelectors()                                         // check boxes for (main) project groups display/hide
+{
+  var groupboxes = "";
+  var prefix = "projectgroup_";
+  for (var i = 0; i < projGroups.length; i++) {
+    var group = projGroups[i];
+    var name = group.name;
+    if (group.selected == "hide") {                                  // hidden groups do not display check box
+      continue;
+    }
+    groupboxes +='<input class="w3-check" type="checkbox"' + group.selected + ' id="' + prefix + name + 
+                 '" onchange=' + "'" + 'toggleGroup("' + prefix + '", "' + name +  '")' + 
+                 "'/><label>" + name + '&nbsp;&nbsp;&nbsp;</label>';
+  }
+  document.getElementById("projGroups").innerHTML = groupboxes;
+}
+
+function selectDir(caption)                                          // triggered by html "..." button
+{
+  if (selectedDir == "") {
+    var selectedRelease = document.getElementById("ncsRelease").value;
+    selectedDir = releases.ncs_releases[selectedRelease].ncs_path; // default: search in ncs project directory
+  }
+  selectedDir = NORDIC_fixPath(studio.browseExistingDirectory(caption, selectedDir));
+  if (selectedDir) {
+    var selectedProjects = recurseProjDir(dirname(selectedDir), basename(selectedDir), "Selected");
+    for (var newIx = 0; newIx < selectedProjects.length; newIx++) {
+      projects.unshift(selectedProjects[newIx]);
+    }
+    updateProjectListDisplay();
+  }
+}
+
+function updateProjectListDisplay()
+{
+  var options = ""; 
+  
+  for (var i = 0; i < addedProjects.length; i++) {
+    var proj = addedProjects[i];
+    addedProjValue = 1000 + i
+    options += "<option style='font-weight:normal' value='" + addedProjValue +"'>" + basename(proj.relpath) + "</option>";
+  }
+  
+  var currentGroup = "";
+  var firstgroup = true;
+
+  for (var i = 0; i < projects.length; i++) {
+    var proj = projects[i];
+    var rootgroup = proj.group;
+    var rootend = proj.group.indexOf("|");
+    if (rootend > 0) {
+      rootgroup = rootgroup.slice(0, rootend-1).trim();
+    }
+    var grpelt = document.getElementById("projectgroup_" + rootgroup);
+    if (grpelt && grpelt.value != "on") {                            // if no checkbox: show unconditionally
+      continue;                                                      // group deselected by user
+    }
+    if (proj.group != currentGroup) {
+      if (!firstgroup) {
+        options += "</optgroup>";
+      }
+      options +='<optgroup label="' + proj.group + '">';
+      currentGroup = proj.group;
+      firstgroup = false;
+    }
+    options += "<option value='" + i + "'>" + basename(proj.relpath) + "</option>";
+  }
+  if (!firstgroup) {
+    options += "</optgroup>";                                        // only if anything was added
+  }
+
+  if(options == "") {
+    options += '<option disabled>---- Please select a project group or manually add a project ----</option>';
+  }
+
+  document.getElementById("projects").innerHTML = options;
+  updateBuildDirectory();
+}
+
+// build tables representing projects and project groups:
+
+// note: conceptually, projectGroups is a tree structure, but as a q&d implementation,
+//       branches are rolled out as a single string, with levels separated by "|"
+//       e.g. "maingroup | sub1 | sub2". 
+//       In time, this should be refactored as a proper tree structure
+
+var projGroups = [];                   // each entry: {name, selected, shown}
+var projects = [];                     // each entry: {relpath, path}
+
+var unsavedProjects = false;           // true while collecting values for selecting project files
+var cflineno = 0;                      // for error messages: line no in configuration file
+
+function endsWith(str, tail)
+{
+  return ((str.length >= tail.length) && (str.substr(-tail.length) == tail));
+}
+
+function getFullPath(index)
+{
+  var sourceDir = "";
+  var proj = [];
+  proj = projects[index];
+  if(proj != null)
+  {
+    sourceDir = proj.path;
+  }
+
+  if (sourceDir && endsWith(sourceDir, ".emProject")) {              // applies to recent project list
+    sourceDir = dirname(dirname(sourceDir));
+  }
+  return sourceDir;
+}
+
+function recurseProjDir(root, relDir, group)
+{
+  var matches = [];                                                  // entries:  [relpath, path, group]
+
+  if (studio.fileExists(root + "/" + relDir + "/sample.yaml") ||
+      studio.fileExists(root + "/" + relDir + "/testcase.yaml")) {
+    // We have a sample or test, add it to matches and return.
+    matches.push({relpath: relDir, path: root + "/" + relDir, group: group});
+	return matches;
+  }
+  else if(studio.fileExists(root + "/" + relDir + "/CMakeLists.txt")) {
+    // Could be a candidate
+    var mklist = studio.readFileToString(root + "/" + relDir + "/CMakeLists.txt");
+    if (mklist.indexOf("find_package(Zephyr") >=0 ||
+        mklist.indexOf("include($ENV{ZEPHYR_BASE}") >= 0) {
+        matches.push({relpath: relDir, path: root + "/" + relDir, group: group});
+	    return matches;
+    }
+  }
+  else if(studio.fileExists(root + "/" + relDir + "/CMakeCache.txt")) {
+    // We are in a build folder so don't look further.
+	return matches;
+  }
+
+  // Look for subdirs.
+  var dirObjects = studio.getDirectoryList(root + "/" + relDir + "/", "*");
+
+  for (var i = 0; i < dirObjects.length; i++) {
+    var proj = dirObjects[i];
+    if (proj == "." || proj == ".." || proj[0] =="." ||
+      proj == "Kconfig"       || endsWith(proj, ".log") ||
+      endsWith(proj, ".conf") || endsWith(proj, ".rst") ||
+      endsWith(proj, ".yml")  || endsWith(proj, ".yaml") ||
+      endsWith(proj, ".c")    || endsWith(proj, ".h") ) {
+      continue;                                                      // no use trying to recurse these files!
+    }
+
+    var projDir =  relDir + "/" + proj;
+
+    var subMatch =  recurseProjDir(root, projDir, group);
+    for (var p = 0; p < subMatch.length; p++) {
+      matches.push(subMatch[p]);
+    }
+  }
+  return matches;
+}
+
+function addGroup(newGroup, selected)
+{
+  // this is a fake recursive structure - implemented as a flat sequence
+  // note that while it (sort of) allows the separator character "|" in a group name,
+  // this will be interpreted as another level by functions breaking up the string.
+
+  if (!newGroup || newGroup.length == 0) {
+    return;
+  }
+
+  //  todo: normalize grop names to have a single space 
+  //        before and after level separator
+  //        (alternately: make a proper tree structure!)
+  
+  for (i = 0; i < projGroups.length; i++) {
+    if (projGroups[i].name == newGroup) {
+      return;                                              // already known
+    }
+  }
+  projGroups.push({name: newGroup, selected: selected});
+}
+
+function addProjects(pathList, currentGroup, omitList, includeList) 
+{
+  var selectedRelease = document.getElementById("ncsRelease").value;
+  var ncsp = releases.ncs_releases[selectedRelease].ncs_path;
+
+  if (!unsavedProjects) {
+    return;
+  }
+  for (var p = 0; p < pathList.length; p++) {
+    var matches = recurseProjDir(ncsp, pathList[p], currentGroup);
+    
+    // note: we have rejected regex specification of omit/include, as regex is
+    //       not very transparent. Developers could write complex regex-es, 
+    //       interpreted dynamically, and you can't see the effect from the spec.
+    //       Wildcards ("*", "?") as a "regex light" would be desirable, but as 
+    //       JS has no native support, it would require a lot of JS code.
+    //       Therefore, the lists are plain, full-match strings.
+    
+    for (var cand = 0; cand < matches.length; cand++) {
+      var proj = matches[cand];
+      var acceptIt = true;
+
+      if (includeList.length > 0) {
+        acceptIt = false;
+        for (var i = 0; i < includeList.length; i++)  {
+          // the following absolute equality could be replaced
+          // with code to implement wildcard matching
+          if (includeList[i] == basename(proj.relpath)) {
+            acceptIt = true;
+            break;
+          }
+        }
+      }
+
+      if (omitList.length > 0) {
+        for (var i = 0; i < omitList.length; i++)  {
+          // the following absolute equality could be replaced
+          // with code to implement wildcard matching
+          if (omitList[i] == basename(proj.relpath)) {
+            acceptIt = false;
+            break;
+          }
+        }
+      }
+
+      if (acceptIt) {
+        projects.push(proj);
+      }
+    }  
+  }
+}
+
+function findProjects()
+{
+  var selectedRelease = document.getElementById("ncsRelease").value;
+  var ncsp = releases.ncs_releases[selectedRelease].ncs_path;
+  var dirlist = ncsp + "/nrf/samples/projdir.yaml";      // file location may be reconsidered
+
+  projGroups = [];                   // clear proj group
+  projects = [];                     // clear projects
+
+  if (!studio.fileExists(dirlist)) {
+    // fallback in case the external file is umavailable
+
+    // predeclare projectGroups so that the selected flag can be set false
+    addGroup("Getting Started",       "checked");
+    addGroup("Short Range",           "checked");
+    addGroup("Cellular",              "");
+    addGroup("Drivers / Peripheral",  "");
+    addGroup("Other Nordic Projects", "");
+
+    unsavedProjects = true;
+    addProjects(["nrf/samples/bluetooth/peripheral_lbs"], "Getting Started | nRF",                [],    []);
+    addProjects(["zephyr/samples/basic"],                 "Getting Started | Zephyr",             [],    []);
+    addProjects(["zephyr/samples/hello_world"],           "Getting Started | Zephyr",             [],    []);
+    addProjects(["nrf/applications/nrf_desktop"],         "Short Range | Bluetooth Applications", [],    []);
+    addProjects(["nrf/applications/connectivity_bridge"], "Short Range | Bluetooth Applications", [],    []);
+    addProjects(["nrf/samples/bluetooth"],                "Short Range | Bluetooth",              [],    []);
+    addProjects(["zephyr/samples/bluetooth"],             "Short Range | Bluetooth",              [],    []);
+    addProjects(["nrf/samples/zigbee"],                   "Short Range | Zigbee",                 [],    []);
+    addProjects(["nrf/samples/openthread"],               "Short Range | Thread",                 [],    []);
+    addProjects(["nrf/applications/asset_tracker"],       "Cellular | Applications",              [],    []);
+    addProjects(["nrf/applications/serial_lte_modem"],    "Cellular | Applications",              [],    []);
+    addProjects(["nrf/samples/nrf9160"],                  "Cellular | nRF9160",                   [],    []);
+    addProjects(["nrf/samples/nfc"],                      "Drivers / Peripheral | nfc",           [],    []);
+    addProjects(["nrf"],                                  "Other Nordic Projects",                [],    []);
+    unsavedProjects = false;
+    return;
+  }
+
+  // The following parsing of projdir.yaml is at most rudimentary.
+  // It is taken for granted that if the final solution is based on a yaml file,
+  // some general yaml parser package will be adopted, and the required fields
+  // be selected from the output of that package.
+  // The code is deliberately not cluttered down with error checks etc,
+  // but rather highlighting the information to be pulled out of a parse tree
+
+  var pathList = [];
+  var omitList = [];
+  var includeList = [];
+  var inPathList = false;
+  var inOmitList = false;
+  var inIncludeList = false;
+  var projDirs = studio.readFileToString(dirlist);
+  var currentGroup = "";
+  var selected = "";
+
+  var allRecent = studio.getRecentSolutions(5);
+  for (var i = 0; i < allRecent.length; i++) {
+    var recent = allRecent[i];
+    projects.push({relpath: recent.title, path: recent.url, group: "Recent"});
+  }
+
+  var config = {rest: projDirs, more: true };
+  while (config.more) {
+    entry = getLine(config).trim();                                     //  split a new line off config
+    
+    if (entry.indexOf(":") < 0) {
+      if (entry.slice(0,2) == "- ") {                                   // new list entry
+        entry = entry.substr(2);
+        if (inOmitList) {
+          omitList.push(entry);                                         // full base name of single project to be omitted
+          continue; 
+        }
+        if (inIncludeList) {
+          includeList.push(entry);                                     // full base name of single project to be included
+          continue; 
+        }
+        if (inPathList) {
+          pathList.push(entry);                                        // full base name of single path to be searched for projects
+          continue; 
+        }
+      }
+    }
+
+    if (entry.slice(0,2) == "- ") {
+      entry = entry.substr(2);
+    }
+    var keyEnd = entry.indexOf(":");
+    if (keyEnd < 0) continue;
+    var key = entry.slice(0, keyEnd).trim();
+    var value = entry.substr(keyEnd + 1).trim();
+
+    switch (key) {
+
+      case "projects":                                                 // root - later extensions may add other info trees
+        continue;
+      
+      case "group":
+        // process previous group, if any:
+        addProjects(pathList, currentGroup, omitList, includeList);    // save previous entry, if any
+        addGroup(currentGroup, selected);
+        unsavedProjects = false;
+        
+        currentGroup = value;
+        pathList = [];
+        omitList = [];
+        includeList = [];
+        inPathList = false
+        inOmitList = false
+        inIncludeList = false;
+        unsavedProjects = true;
+        selected = "";
+        break;
+
+      case "select":
+        selected = value;
+        break;
+
+      case "path":
+        inPathList = true;
+        inOmitList = false
+        inIncludeList = false;
+        break;
+
+      case "include":
+        inIncludeList = true;
+        inPathList = false
+        inOmitList = false
+        break;
+
+      case "omit":
+        inOmitList = true;
+        inPathList = false
+        inIncludeList = false;
+        break;
+
+      default:
+        alert("Unrecognized attribute key: " + entry);
+    }
+    unsavedProjects = true;
+  }
+
+  addProjects(pathList, currentGroup, omitList, includeList);
+  addGroup(currentGroup, selected);
+  unsavedProjects = false;
+}
+
+function getLine(config)                                   // split off the first line from config.rest and put in config.line
+{
+  var rest = config.rest;
+  var line = "";
+
+  while (line == "") {                                     // skip blank lines and comment lines made into blank lines
+    cflineno++;               
+    var lineend = rest.indexOf("\n");
+    if (lineend >= 0) {
+      line = rest.substr(0, lineend);
+      rest = rest.substr(lineend + 1);
+    }
+    else {                                                 // last line
+      line = rest;                                         // may be non-blank if file not terminated by newline
+      rest = "";                                           // will certainly be blank next time around
+    }
+    line = line.trim();
+    if (line[0] == "#" ) {
+      line = "";                                          // comment line - note: we do not handle end-of-line comments
+    }
+    if (rest == "") {
+      config.more = false;
+      break;
+    }
+  }
+  config.rest = rest;
+  return line;
+}
+
+function updateMenu(show)
+{
+  if (show) {
+    document.getElementById("cmakeOptionsSection").style.display = "block";
+  } else {
+    document.getElementById("cmakeOptionsSection").style.display = "none";
+  }
+}
+
+function verifyToolchain(selected_toolchain)
+{
+  // Toolchains are provided as CMake packages, and thus verified there, except
+  // the NONE, which is the SES defined.
+  if (selected_toolchain == "NONE") {
+    var selectedRelease = document.getElementById("ncsRelease").value;
+    var zephyr = releases.ncs_releases[selectedRelease].zephyr_base;
+    var toolchainDir = studio.getEnvironmentSetting("Nordic/ToolchainDir");
+
+    if (toolchainDir == "") {
+      // Get setting from previous location for backward compatility
+      toolchainDir = studio.getUserSetting("ARM/Zephyr/ToolchainDir");
+      if (toolchainDir == "") {
+        // Get setting from user
+        if (!studio.showWarningMessageBox("GNU ARM Embedded Toolchain Directory Not Set", "<p>The <b>nRF Connect &gt; Directories > GNU ARM Embedded Toolchain Directory</b> environment option has not been set.</p><p>Click <b>OK</b> to locate this directory.</p>")) {
+          studio.closeWindow(0);
+          return;
+        }
+        toolchainDir = studio.browseExistingDirectory("Locate Zephyr Base", zephyr);
+      }
+      if (toolchainDir == "") {
+        studio.closeWindow(0);
+        return;
+      }
+      studio.setEnvironmentSetting("Nordic/ToolchainDir", NORDIC_fixPath(toolchainDir));
+      toolchain.ncs_toolchain_gnuarmemb_path = NORDIC_fixPath(toolchainDir);
+    }
+  }
+}
+
+function locateCMake() {
+  var cmake_candidates = [];
+
+  cmake_candidates.push(studio.getEnvironmentSetting("Nordic/CMakeExecutable"));
+
+  var host_os  = studio.getSystemMacro("HostOS");
+  if (host_os == "win") {
+    var regQuery = "reg";
+    studio.createProcessObject("reg", true);
+    var args = ["query", "HKCU\\Software\\Kitware\\CMake\\Packages\\NcsToolchain", "/v", "*"];
+
+    if (reg.start(regQuery, args)) {
+      if (reg.waitForFinished(1000*5)) {
+        var entries = reg.readStandardOutput().split('\n');
+
+        for (var i = 0; i < entries.length; i++) {
+          var typeIndex = entries[i].indexOf('REG_SZ');
+          if (typeIndex > 0) {
+            var ncs_toolchain = entries[i].substr(typeIndex + 7).trim();
+            cmake_candidates.push(dirname(ncs_toolchain) + "/opt/bin/cmake");
+          }
+        }
+      }
+    }
+  }
+  else {
+    var home = studio.getSystemMacro("HomeDir");
+    cmake_packages_ncs = studio.getDirectoryList(home + "/.cmake/packages/NcsToolchain", "[0-9a-fA-F]*");
+    for (var i = 0; i < cmake_packages_ncs.length; i++) {
+      var ncs_toolchain = studio.readFileToString(home + "/.cmake/packages/NcsToolchain/" + cmake_packages_ncs[i])
+      // NCS Toolchain on Linux has CMake in usr/bin/cmake and on Mac bin/cmake.
+      // Just check both places as this will also allow freedom of rearranging later.
+      if (studio.fileExists(dirname(ncs_toolchain) + "/usr/bin/cmake")) {
+        cmake_candidates.push(dirname(ncs_toolchain) + "/usr/bin/cmake")
+      }
+      else if (studio.fileExists(dirname(ncs_toolchain) + "/bin/cmake")) {
+        cmake_candidates.push(dirname(ncs_toolchain) + "/bin/cmake")
+      }
+    }
+  }
+
+  // Default PATH as last option.
+  cmake_candidates.push("cmake");
+
+  studio.createProcessObject("cmake", true);
+  var args = ["--version"];
+
+  for (var i = 0; i < cmake_candidates.length; i++) {
+    if (cmake_candidates[i] == "") {
+      continue;
+    }
+
+    if (!cmake.start(cmake_candidates[i], args)) {
+      continue;
+    }
+
+    if (!cmake.waitForFinished(1000*5)) {
+      continue;
+    }
+
+    var version = cmake.readStandardOutput();
+    if (version == "") {
+      // No version information. Studio doesn't fail on Linux if the executable
+      // does not exist, thus we have to rely on the stdout stream.
+      // If no output, then it's not a valid CMake.
+      continue;
+    }
+
+    return cmake_candidates[i];
+  }
+
+  if (!studio.showWarningMessageBox("CMake not found", "<p><b>NCS Toolchain</b> or <b>CMake</b> was not found or is not working correctly.</p><p>Click <b>OK</b> to select a local CMake executable.</p>")) {
+    studio.closeWindow(0);
+    return;
+  }
+  var cmakeExecutable = studio.browseExistingFileName("Locate CMake", "/");
+  if (cmakeExecutable == "") {
+    studio.closeWindow(0);
+    return;
+  }
+  cmakeExecutable = NORDIC_fixPath(cmakeExecutable);
+  studio.setEnvironmentSetting("Nordic/CMakeExecutable", cmakeExecutable);
+  return cmakeExecutable;
+}
+
+// Window initialization:
+
+$(document).ready(function()
+{
+  var zephyr = studio.getEnvironmentSetting("Nordic/ZephyrBase");
+  if (zephyr == "") {
+    // Get setting from previous location for backward compatility
+    zephyr = studio.getSolutionAttribute("source_directory");
+    if (zephyr == "") {
+      zephyr = studio.getUserSetting("ARM/Zephyr/Base");
+    }
+  }
+
+  var cmakeExecutable = locateCMake();
+  if (!cmakeExecutable) {
+    return;
+  }
+
+  studio.createProcessObject("cmake", true);
+  var args = [];
+  if (zephyr != "") {
+    args.push("-DZEPHYR_BASE=" + zephyr);
+  }
+
+  // CMake version 3.8 and older did not set `CMAKE_HOST_SYSTEM_NAME` in process
+  // script mode. Therefore setting it here, so that NCS Toolchain CMake
+  // packages can be handled correctly.
+  // Newer CMake will ignore this value, and use their internal.
+  var host_os  = studio.getSystemMacro("HostOS");
+  if (host_os == "win") {
+    args.push("-DCMAKE_HOST_SYSTEM_NAME=Windows");
+  }
+  else if (host_os == "linux") {
+    args.push("-DCMAKE_HOST_SYSTEM_NAME=Linux");
+  }
+  else {
+    args.push("-DCMAKE_HOST_SYSTEM_NAME=Darwin");
+  }
+
+  args.push("-P");
+  args.push(studio.getSystemMacro("StudioDir") + "/cmake/find_ncs_releases.cmake");
+  if (!cmake.start(cmakeExecutable, args)) {
+    throw "Cannot start \"" + cmakeExecutable + "\" for project location";
+  }
+  if (!cmake.waitForFinished(1000*60)) {
+    throw "Did not finish \"" + cmakeExecutable + "\"";
+  }
+  // CMake print the json string to std error, this is due to the nature of `message()` function.
+  var releasesJson = cmake.readStandardError();
+
+  releases = JSON.parse(releasesJson);
+
+  if (zephyr == "" && releases.ncs_releases.length == 0) {
+    // Get setting from user
+    if (!studio.showWarningMessageBox("Zephyr Base Not Set", "<p>The <b>nRF Connect &gt; Directories > Zephyr Base</b> environment option has not been set.</p><p>Click <b>OK</b> to locate this directory.</p>")) {
+      studio.closeWindow(0);
+      return;
+    }
+    zephyr = studio.browseExistingDirectory("Locate Zephyr Base", "/");
+    if (zephyr == "") {
+      studio.closeWindow(0);
+      return;
+    }
+  }
+  zephyr = NORDIC_fixPath(zephyr);
+  studio.setEnvironmentSetting("Nordic/ZephyrBase", zephyr);
+
+  // This adds the ZEPHYR_BASE as a release of its own.
+  // Primarily to support NCS <1.3 releases.
+  if (zephyr != "") {
+    zephyr_base_release = {"ncs_version":"ZEPHYR_BASE",
+                           "ncs_path":dirname(zephyr),
+                           "nrf_path":dirname(zephyr) + "/nrf",
+                           "zephyr_base":zephyr,
+                           "ncs_toolchain_preferred":"",
+                           "ncs_toolchain_comp_list":[],
+                           "thingy_boards_list":[],
+                           "nordic_boards_list":[],
+                           "other_boards_list":[]};
+    releases.ncs_releases.push(zephyr_base_release);
+  }
+
+  var cmakelists = studio.getSolutionAttribute("cmakelists_file_name");
+  if (cmakelists == "") {
+    cmakelists = NORDIC_fixPath(studio.getUserSetting("ARM/Zephyr/CMakeLists"));
+  }
+  var build = studio.getSolutionAttribute("build_directory");
+  if (build == "") {
+    build = NORDIC_fixPath(studio.getUserSetting("ARM/Zephyr/BuildDir"));
+  }
+  var board = studio.getSolutionAttribute("board_directory");
+  if (board == "") {
+    board = NORDIC_fixPath(studio.getUserSetting("ARM/Zephyr/BoardDir"));
+  }
+
+  updateNcsReleases();
+  updateNcsToolchain();
+
+  if (releases.ncs_toolchains.length == 0) {
+    verifyToolchain("NONE");
+  }
+
+  var name = studio.getSolutionAttribute("board_name");
+  if (name == "") {
+    name = basename(board);
+  }
+  lastSelectedBoardName = name;
+
+  // document.getElementById("buildDir").value = build;
+  document.getElementById("boardDir").value = board;
+  document.getElementById("boardName").value = name;
+  document.getElementById("cmakeOptions").value = studio.getEnvironmentSetting("Nordic/CMakeOptions");
+}
+);
+
+    </script>
+  </head>
+
+  <body>
+    <div class="w3-container header w3-light-blue">
+      <div class="w3-left">
+        <img src="images/nRFConnectLogo.png" />
+      </div>
+      <div class="w3-left w3-padding">
+        <h3 class="w3-text-white">nRF Connect Options</h3>
+      </div>
+    </div>
+
+    <form class="w3-container main">
+
+      <div class="w3-section">
+        <div class="w3-row">
+          <div class="w3-col m5">
+            <label><b>nRF Connect SDK Release: </b></label>
+            <div class="w3-input w3-border w3-round">
+              <select class="w3-select w3-border-0" name="ncsRelease" id="ncsRelease" onchange="updateNcsToolchain()">
+              </select>
+            </div>
+          </div>
+          <div class="w3-col m5" style="padding-left: 64px">
+            <label><b>nRF Connect Toolchain Version: </b></label>
+            <div class="w3-input w3-border w3-round">
+              <select class="w3-select w3-border-0" name="ncsToolchain" id="ncsToolchain" onchange="verifyToolchain(this.value)">
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="w3-section">
+        <label><b>Projects: </b></label>
+        <div class="w3-row">
+          <div class="w3-col m11">
+            <div class="w3-input w3-border w3-round">
+              <select class="w3-select w3-border-0" name="projects" id="projects" onchange="updateBuildDirectory()">
+              </select>
+            </div>
+          </div>
+          <div class="w3-col m1" style="padding-left: 4px">
+            <span class="w3-btn w3-round w3-white w3-border w3-medium" title="Select project directory" onclick='selectDir("Select project directory")'><i class="fa fa-ellipsis-h"></i></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="w3-section"  name="projGroups" id="projGroups" >
+        <!-- Create a checkbox, this is automatically removed later but -->
+        <!-- ensures correct spacing in the layout and avoids a scrollbar -->
+        <input class="w3-check" type="checkbox"/>
+        <!--will be filled in from group names on project directory roots-->
+      </div>
+
+     <div class="w3-section">
+      <label><b>Board Name:</b></label>
+      <div class="w3-row">
+        <div class="w3-col m11">
+          <div class="w3-input w3-border w3-round">
+            <select class="w3-select w3-border-0" name="boardName" id="boardName" onchange="selectBoard(this.value)">
+            </select>
+          </div>
+        </div>
+        <div class="w3-col m1" style="padding-left: 4px">
+          <span class="w3-round w3-white w3-border w3-medium" title="Board Name" />
+        </div>
+        <div class="w3-col m1" style="padding-left: 4px">
+          <span class="w3-btn w3-round w3-white w3-border w3-medium" title="Locate Board Directory" onclick='browseBoard("Locate Board Directory")'><i class="fa fa-ellipsis-h"></i></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="w3-section">
+      <input class="w3-check" type="checkbox" id="boards_thingy" onclick='updateBoardNameOptions(lastSelectedBoardName)' title="Nordic Thingy" checked />
+      <label>Nordic Thingy&nbsp;&nbsp;&nbsp;</label>
+      <input class="w3-check" type="checkbox" id="boards_nordic" onclick='updateBoardNameOptions(lastSelectedBoardName)' title="Nordic kits" checked />
+      <label>Nordic kits&nbsp;&nbsp;&nbsp;</label>
+      <input class="w3-check" type="checkbox" id="boards_others" onclick='updateBoardNameOptions(lastSelectedBoardName)' title="3rd party kits" />
+      <label>3rd party kits&nbsp;&nbsp;&nbsp;</label>
+    </div>
+
+    <div class="w3-section">
+      <div class="w3-row">
+        <div class="w3-col m11">
+          <input type="hidden" class="w3-input w3-border w3-round" type="text" id="boardDir" onchange='updateBoardNameOptions(lastSelectedBoardName)' />
+        </div>
+      </div>
+    </div>
+
+    <div id="cmakeOptionsSection" class="w3-section" hidden>
+        <label><b>Extra CMake Build Options</b></label>
+        <div class="w3-row">
+          <div class="w3-col m11">
+            <input class="w3-input w3-border w3-round" type="text" id="cmakeOptions" />
+          </div>
+        </div>
+      </div>
+
+    <div class="w3-section">
+        <label><b>Build Directory</b></label>
+        <div class="w3-row">
+          <div class="w3-col m11">
+            <input class="w3-input w3-border w3-round" type="text" id="buildDir" />
+          </div>
+          <div class="w3-col m1" style="padding-left: 4px">
+            <span class="w3-btn w3-round w3-white w3-border w3-medium" title="Locate Build Directory" onclick='browse("Locate Build Directory", "buildDir", true)'><i class="fa fa-ellipsis-h"></i></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="w3-section">
+        <input class="w3-check" type="checkbox" id="deleteBuildDir" title="Clean Build Directory"/>
+        <label>Clean Build Directory&nbsp;&nbsp;&nbsp;</label>
+        <input class="w3-check" type="checkbox" id="extendedSettings" title="Extended Settings" onchange='updateMenu(this.value)'/>
+        <label>Extended Settings&nbsp;&nbsp;&nbsp;</label>
+      </div>
+    </form>
+
+    <div class="footer w3-light-grey">
+      <div class="w3-section w3-padding w3-right">
+        <span class="w3-btn w3-round w3-white w3-border w3-medium" onclick="createProject();">OK</span>
+        <span class="w3-btn w3-round w3-white w3-border w3-medium" onclick="studio.closeWindow(0);">Cancel</span>
+      </div>
+    </div>
+
+  </body>
+</html>

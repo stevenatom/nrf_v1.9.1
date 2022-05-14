@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Types>
+
+  <List Name="array&lt;*,*&gt;"
+        Head="&amp;$(E)._M_elems"
+        Data="(*($(T0)*)CURRENT)"
+        Length="$(T1)"
+        Next="CURRENT+sizeof($(T0))"/>
+
+  <Deque Name="deque&lt;*,*&gt;"
+         Condition="$(E)._M_impl._M_finish._M_cur!=CURRENT"
+         Head="$(E)._M_impl._M_start._M_cur"
+         Data="(*($(T0) *)CURRENT)"
+         Next="CURRENT+sizeof($(T0))"        
+         ChunkSize="$(E)._M_impl._M_start._M_last-$(E)._M_impl._M_start._M_first"
+         ChunkMap="$(E)._M_impl._M_start._M_node"
+         ChunkData="*(unsigned *)CURRENT"
+         ChunkNext="CURRENT+4"/>
+
+  <Expr Name="_Deque_iterator&lt;*,*,*&gt;"
+        Expr="*$(E)._M_cur"/>
+
+  <Expr Name="reverse_iterator&lt;*&gt;"
+        Expr="$(E).current"/>
+
+  <Expr Name="iterator"
+        Expr="*($(E)._M_current)"/>
+
+  <Expr Name="iterator&lt;*,*,*,*,*&gt;"
+        Expr="$(E).current"/>
+
+  <Expr Name="const_iterator"
+        Expr="*($(E)._M_current)"/>
+
+  <Expr Name="reverse_iterator"
+        Expr="*($(E).current._M_current)"/>
+
+  <Expr Name="__normal_iterator&lt;*,*&gt;"
+        Expr="*($(E)._M_current)"/>
+
+  <List Name="forward_list&lt;*,*&gt;"
+        Condition="CURRENT"
+        Head="$(E)._M_impl._M_head._M_next"
+        Data="($(T0)*)(CURRENT+4)"
+        Next="((_Fwd_list_node_base*)CURRENT)._M_next"/>
+
+  <Expr Name="_Fwd_list_iterator&lt;*&gt;"
+        Expr="($(T0)*)(($(E)._M_node)+1)"/>
+
+  <Expr Name="_Fwd_list_const_iterator&lt;*&gt;"
+        Expr="($(T0)*)(($(E)._M_node)+1)"/>
+
+  <List Name="list&lt;*,*&gt;"
+        Condition="HEAD!=CURRENT"
+        Head="(*($(T)*)HEAD)._M_impl._M_node._M_next"
+        Data="($(T0))((*(_List_node&lt;$(T0) &gt;*)CURRENT))._M_storage)"
+        Next="(*(_List_node&lt;$(T0) &gt;*)CURRENT)._M_next"/>
+
+  <Expr Name="_List_iterator&lt;*&gt;"
+        Expr="(($(T0))(*(_List_node&lt;$(T0) &gt;*)($(E)._M_node))._M_storage)"/>
+
+  <Expr Name="_List_const_iterator&lt;*&gt;"
+        Expr="(($(T0))(*(_List_node&lt;$(T0) &gt;*)($(E)._M_node))._M_storage)"/>
+
+  <RBTree Name="map&lt;*,*,*,*&gt;"
+        Condition="&amp;((($(T)*)HEAD)._M_t._M_impl::_Rb_tree_header._M_header)!=CURRENT"
+        Head="(*($(T)*)HEAD)._M_t._M_impl::_Rb_tree_header._M_header._M_left"
+        Data="((std::pair&lt;$(T0) const, $(T1) &gt;)((*(_Rb_tree_node&lt;std::pair&lt;$(T0) const, $(T1) &gt; &gt;*)CURRENT))._M_storage)"
+        Left="(*(_Rb_tree_node_base*)CURRENT)._M_left"
+        Right="(*(_Rb_tree_node_base*)CURRENT)._M_right"
+        Parent="(*(_Rb_tree_node_base*)CURRENT)._M_parent"/>
+
+  <Expr Name="_Rb_tree_iterator&lt;*&gt;"
+        Expr="(($(T0))(*(_Rb_tree_node&lt;$(T0) &gt;*)($(E))._M_node)._M_storage)"/>
+
+  <Expr Name="_Rb_tree_const_iterator&lt;*&gt;"
+        Expr="(($(T0))(*(_Rb_tree_node&lt;$(T0) &gt;*)($(E))._M_node)._M_storage)"/>
+
+  <Expr Name="priority_queue&lt;*,*,*&gt;"
+        Expr="$(E).c"/>
+
+  <Expr Name="queue&lt;*,*&gt;"
+        Expr="$(E).c"/>
+
+  <RBTree Name="set&lt;*,*,*&gt;"
+        Condition="(&amp;((($(T)*)HEAD)._M_t._M_impl::_Rb_tree_header._M_header))!=CURRENT"
+        Head="(*($(T)*)HEAD)._M_t._M_impl::_Rb_tree_header._M_header._M_left"
+        Data="(($(T0))(*(_Rb_tree_node&lt;$(T0) &gt;*)CURRENT)._M_storage)"
+        Left="(*(_Rb_tree_node_base*)CURRENT)._M_left"
+        Right="(*(_Rb_tree_node_base*)CURRENT)._M_right"
+        Parent="(*(_Rb_tree_node_base*)CURRENT)._M_parent"/>
+
+  <Expr Name="stack&lt;*,*&gt;"
+        Expr="$(E).c"/>
+
+  <String Name="basic_string&lt;char,*,*&gt;"
+        Data="*(($(T)*)HEAD)._M_dataplus._M_p"/>
+
+  <List Name="vector&lt;*,*&gt;"
+        Condition="((_Vector_base&lt;$(T0), $(T1) &gt;*)HEAD)._M_impl::_Vector_impl_data._M_finish!=CURRENT"
+        Head="((_Vector_base&lt;$(T0), $(T1) &gt;*)HEAD)._M_impl::_Vector_impl_data._M_start"
+        Data="(*($(T0)*)CURRENT)"
+        Next="CURRENT+sizeof($(T0))"/>
+
+  <Tuple Name="pair2&lt;*,*&gt;"
+         first="(*($(T)*)HEAD).first"
+         second="(*($(T)*)HEAD).second"/>
+
+  <Tuple Name="pair&lt;*,*&gt;"
+         first="$(E).first"
+         second="$(E).second"/>
+
+  <Tuple Name="tuple&lt;*,*&gt;"
+         first ="(*($(T)*)HEAD)::_Tuple_impl&lt;0, $(T0), $(T1) &gt;::_Head_base&lt;0, $(T0), false &gt;._M_head_impl"
+         second="(*($(T)*)HEAD)::_Tuple_impl&lt;0, $(T0), $(T1) &gt;::_Tuple_impl&lt;1, $(T1) &gt;::_Head_base&lt;1, $(T1), false &gt;._M_head_impl"/>
+
+  <Tuple Name="tuple&lt;*,*,*&gt;"
+         first ="(*($(T)*)HEAD)::_Tuple_impl&lt;0, $(T0), $(T1), $(T2) &gt;::_Head_base&lt;0, $(T0), false &gt;._M_head_impl"
+         second="(*($(T)*)HEAD)::_Tuple_impl&lt;0, $(T0), $(T1), $(T2) &gt;::_Tuple_impl&lt;1, $(T1), $(T2) &gt;::_Head_base&lt;1, $(T1), false &gt;._M_head_impl"
+         third ="(*($(T)*)HEAD)::_Tuple_impl&lt;0, $(T0), $(T1), $(T2) &gt;::_Tuple_impl&lt;1, $(T1), $(T2) &gt;::_Tuple_impl&lt;2, $(T2) &gt;::_Head_base&lt;2, $(T2), false &gt;._M_head_impl"/>
+
+  <Tuple Name="tuple&lt;*,*,*,*&gt;"
+         first ="(*($(T)*)HEAD)::_Tuple_impl&lt;0, $(T0), $(T1), $(T2), $(T3) &gt;::_Head_base&lt;0, $(T0), false &gt;._M_head_impl"
+         second="(*($(T)*)HEAD)::_Tuple_impl&lt;0, $(T0), $(T1), $(T2), $(T3) &gt;::_Tuple_impl&lt;1, $(T1), $(T2), $(T3) &gt;::_Head_base&lt;1, $(T1), false &gt;._M_head_impl"
+         third ="(*($(T)*)HEAD)::_Tuple_impl&lt;0, $(T0), $(T1), $(T2), $(T3) &gt;::_Tuple_impl&lt;1, $(T1), $(T2), $(T3) &gt;::_Tuple_impl&lt;2, $(T2), $(T3) &gt;::_Head_base&lt;2, $(T2), false &gt;._M_head_impl"
+         fourth="(*($(T)*)HEAD)::_Tuple_impl&lt;0, $(T0), $(T1), $(T2), $(T3) &gt;::_Tuple_impl&lt;1, $(T1), $(T2), $(T3) &gt;::_Tuple_impl&lt;2, $(T2), $(T3) &gt;::_Tuple_impl&lt;3, $(T3) &gt;::_Head_base&lt;3, $(T3), false &gt;._M_head_impl"/>
+
+  <Expr Name="value_type*"
+        Expr="*($(E))"/>
+
+  <Expr Name="const value_type*"
+        Expr="*($(E))"/>
+
+  <!--
+  <List Name="VeryBasicArray&lt;*&gt;"
+        Head="(($(T)*)HEAD).m_pData"
+        Data="(*($(T0)*)CURRENT)"
+        Length="(($(T)*)HEAD).m_Count"
+        Next="CURRENT+sizeof($(T0))"/>
+
+  <List Name="List&lt;*,*&gt;"
+        Head="&amp;(($(T)*)HEAD).m_buffer[(($(T)*)HEAD).m_firstNodeIndex]"
+        Data="((node*)CURRENT).target"
+        Length="(($(T)*)HEAD).m_count"
+        Next="&amp;(($(T)*)HEAD).m_buffer[((node*)CURRENT).nextNode]"/>
+  -->
+
+</Types>

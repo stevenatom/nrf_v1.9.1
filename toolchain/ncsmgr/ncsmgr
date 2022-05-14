@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+
+unset baseDir
+
+log() {
+    echo ${*}
+}
+
+error() {
+    log $1
+    exit 1
+}
+
+pass() {
+    log "done"
+}
+
+fail() {
+    error "failed"
+}
+
+mgrDir="$(dirname $0)"
+source "${mgrDir}/manifest.env" || error "Failed to source ${mgrDir}/manifest.env"
+
+# this converts Windows paths to more sensible ones
+toPosixPath() {
+    local path="${1//\\/\/}"
+    echo "/${path/:}"
+}
+
+case $(uname -s) in
+    Linux)
+        isLinux=1
+        baseDir="$(dirname "$(dirname "$(realpath -s "$0")")")"
+        ;;
+
+    Darwin)
+        isMac=1
+        baseDir="/opt/nordic/ncs/${ncs_tag}/toolchain"
+        ;;
+
+    *)
+        isWindows=1
+
+        # this setting ensures that ln is able to create soft links on windows
+        export MSYS=winsymlinks:nativestrict
+
+        # in git-bash environment we rely on EXEPATH
+        baseDir="$(toPosixPath "${EXEPATH}")"
+        # remove bin if bash was invoked directly
+        baseDir="${baseDir/\/bin/}"
+        # remove single / to avoid // later on
+        [ "${baseDir}" = "/" ] && baseDir=""
+
+        if [ ! -f "${baseDir}/ncsmgr/manifest.env" ] ; then
+            # otherwise (development environment) relative to current script path
+            baseDir="$(dirname "$(dirname "$(realpath "$0")")")"
+        fi
+
+        binDir="${baseDir}/opt/bin"
+        pyDir="${binDir}"
+
+        # WARNING: note the path inherited from calling shell, this might cause issues
+        export PATH="${binDir}":"${binDir}/Scripts":"${PATH}"
+        export PYTHONPATH="${pyDir}":"${pyDir}/lib":"${pyDir}/Lib/site-packages"
+        ;;
+esac
+
+progname=$(basename $0)
+subcommand=$1
+
+case ${subcommand} in
+    ""|-h|--help)
+        echo "Usage: ${progname} <subcommand>"
+        echo
+        echo "Subcommands:"
+        echo "    init-ncs   wraps west init && update"
+        echo
+        exit 0
+        ;;
+    *)
+        shift
+        . "${mgrDir}/ncsmgr_${subcommand}.sh" $@
+        exitcode=$?
+        if [ ${exitcode} = 127 ]; then
+            echo "Error: '$subcommand' is not a known subcommand." >&2
+            echo "    Run '$progname --help' for a list of known subcommands." >&2
+        fi
+        exit ${exitcode}
+        ;;
+esac
+

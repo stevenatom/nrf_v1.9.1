@@ -1,0 +1,1166 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>Release notes for SEGGER Toolchain</title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+    <meta content="RAL PrepHTML" name="GENERATOR"/>
+    
+    <meta content="noindex,nofollow" name="robots"/>
+    <link rel="STYLESHEET" type="text/css" href="../rwt/styles/ses-default.css"/>
+    <link rel="STYLESHEET" type="text/css" href="../rwt/styles/ses.css"/>
+    <link rel="STYLESHEET" type="text/css" href="../rwt/styles/rwt-doc-page.css"/>
+    <link rel="STYLESHEET" type="text/css" href="../rwt/styles/theme.css"/>
+    <script type="text/javascript" language="javascript" src="../rwt/scripts/jquery-latest.js"><!--><-->
+</script>
+    <script type="text/javascript" language="javascript" src="../rwt/scripts/rwt.js"><!--><-->
+</script>
+    <script type="text/javascript" language="javascript" src="../rwt/scripts/rwt-doc-page.js"><!--><-->
+</script>
+    
+  </head>
+
+  <body>
+    <div id="rwt-content">
+      
+<main class="main-content" role="main" id="content">
+  <div class="header">
+    <div class="row">
+      <div id="seggerLogo"> <svg width="150px" x="0px" version="1.1" y="0px" xmlns="http://www.w3.org/2000/svg" height="75px" viewBox="110 27.5 150 75" xmlns:xlink="http://www.w3.org/1999/xlink" style="enable-background:new 110 27.5 150 75;" id="Layer_1" xml:space="preserve">
+        <style type="text/css">
+
+	.st0{fill:#FFFFFF;}
+	.st1{fill:#005CA8;}
+	.st2{fill:#010000;}
+
+</style>
+        <g>
+          <g>
+            <path class="st0" d="M258,96.1c0,2.6-2,4.7-4.4,4.7H115.9c-2.4,0-4.4-2.1-4.4-4.7V33.7c0-2.6,2-4.7,4.4-4.7h137.7&#xa;&#x9;&#x9;&#x9;c2.4,0,4.4,2.1,4.4,4.7"/>
+            <path class="st2" d="M253.7,102.3H115.9c-3.3,0-5.9-2.8-5.9-6.2V33.7c0-3.5,2.6-6.2,5.9-6.2h137.7c3.3,0,5.9,2.8,5.9,6.2v62.4&#xa;&#x9;&#x9;&#x9;C259.6,99.5,256.9,102.3,253.7,102.3z M115.9,30.6c-1.6,0-2.8,1.4-2.8,3.1v62.4c0,1.7,1.3,3.1,2.8,3.1h137.7&#xa;&#x9;&#x9;&#x9;c1.6,0,2.8-1.4,2.8-3.1V33.7c0-1.7-1.3-3.1-2.8-3.1H115.9z"/>
+          </g>
+          <polygon class="st1" points="117.8,52.4 127.1,64.9 117.8,77.3 &#x9;"/>
+          <g>
+            <path class="st1" d="M131.6,41.3l15.6,20.3v0.1c0.4,0.5,1,1,1.7,1h99.7c1.2,0,2.2-1.1,2.2-2.3c0-1.2-1-2.3-2.2-2.3H150l-14.9-19.4&#xa;&#x9;&#x9;&#x9;l0,0c-0.4-0.5-1-0.9-1.7-0.9c-1.2,0-2.2,1-2.2,2.2C131.2,40.4,131.4,40.9,131.6,41.3L131.6,41.3z"/>
+            <path class="st1" d="M140.4,66.3c0.3-0.4,0.5-0.9,0.5-1.4c0-0.5-0.2-1-0.5-1.4l-18.6-24.9l0,0c-0.4-0.5-1-0.9-1.7-0.9&#xa;&#x9;&#x9;&#x9;c-1.2,0-2.2,1-2.2,2.2c0,0.5,0.2,1,0.5,1.4l17.6,23.5l-17.7,23.5c-0.3,0.4-0.5,0.9-0.5,1.4c0,1.2,1,2.2,2.2,2.2&#xa;&#x9;&#x9;&#x9;c0.7,0,1.3-0.3,1.7-0.9l0,0L140.4,66.3z"/>
+            <path class="st1" d="M248.7,67.2h-99.8c-0.7,0-1.3,0.4-1.7,1v0.1l-15.6,20.3l0,0c-0.3,0.3-0.5,0.8-0.5,1.3c0,1.2,1,2.2,2.2,2.2&#xa;&#x9;&#x9;&#x9;c0.7,0,1.3-0.3,1.7-0.9v0.1l15-19.4h98.7c1.2,0,2.2-1.1,2.2-2.3S249.9,67.2,248.7,67.2z"/>
+          </g>
+          <path class="st2" d="M163,80.7c0,0.4-0.1,0.7-0.4,1c-0.3,0.2-0.7,0.3-1.2,0.3c-0.6,0-1.2-0.3-1.8-1c-0.2-0.2-0.3-0.3-0.3-0.3&#xa;&#x9;&#x9;c-0.3-0.3-0.7-0.5-1.2-0.7c-0.5-0.1-1-0.2-1.7-0.2c-0.9,0-1.6,0.2-2.1,0.5c-0.5,0.3-0.7,0.7-0.7,1.3c0,0.7,1,1.3,2.9,1.7&#xa;&#x9;&#x9;c0.5,0.1,0.9,0.2,1.1,0.2c1.2,0.2,2.1,0.5,2.7,0.6s1,0.3,1.5,0.5c0.7,0.3,1.2,0.8,1.6,1.3c0.3,0.6,0.5,1.2,0.5,2&#xa;&#x9;&#x9;c0,1.4-0.6,2.6-1.8,3.4c-1.2,0.9-2.8,1.3-4.9,1.3c-1.2,0-2.1-0.1-2.9-0.3c-0.8-0.2-1.6-0.5-2.4-1c-0.5-0.3-0.9-0.7-1.2-1.2&#xa;&#x9;&#x9;s-0.5-0.9-0.5-1.3c0-0.4,0.1-0.7,0.4-1c0.3-0.3,0.7-0.4,1.2-0.4c0.6,0,1.2,0.3,1.7,1c0.2,0.3,0.3,0.5,0.5,0.6&#xa;&#x9;&#x9;c0.3,0.3,0.7,0.6,1.3,0.8c0.5,0.2,1.1,0.2,1.8,0.2c1.1,0,1.9-0.2,2.5-0.5c0.6-0.3,0.9-0.8,0.9-1.4c0-0.9-1.4-1.6-4.3-2.1&#xa;&#x9;&#x9;c-0.1,0-0.2-0.1-0.2-0.1c-2.2-0.4-3.7-1-4.5-1.6c-0.8-0.6-1.2-1.6-1.2-2.8c0-1.4,0.6-2.5,1.7-3.2c1.1-0.7,2.8-1.2,4.8-1.2&#xa;&#x9;&#x9;c1,0,1.8,0.1,2.6,0.3c0.7,0.2,1.5,0.5,2.1,0.9c0.5,0.3,0.9,0.6,1.2,1C162.8,79.9,163,80.3,163,80.7z"/>
+          <path class="st2" d="M177.8,89.6c0.6,0,1.1,0.1,1.4,0.3c0.3,0.2,0.5,0.6,0.5,1s-0.2,0.7-0.5,1c-0.3,0.2-0.8,0.3-1.4,0.3h-9&#xa;&#x9;&#x9;c-0.8,0-1.4-0.2-1.7-0.5c-0.3-0.3-0.5-0.9-0.5-1.8V80c0-0.9,0.1-1.5,0.5-1.8c0.3-0.3,0.9-0.5,1.7-0.5h8.6c0.6,0,1.1,0.1,1.4,0.3&#xa;&#x9;&#x9;c0.3,0.2,0.5,0.5,0.5,1c0,0.4-0.2,0.7-0.5,0.9c-0.3,0.2-0.8,0.3-1.4,0.3h-7.2v3.1h6.5c0.6,0,1.1,0.1,1.4,0.3c0.3,0.2,0.5,0.5,0.5,1&#xa;&#x9;&#x9;c0,0.4-0.2,0.7-0.5,0.9c-0.3,0.2-0.8,0.3-1.4,0.3h-6.5v3.7L177.8,89.6L177.8,89.6z"/>
+          <path class="st2" d="M194.2,86.9h-2.6c-0.5,0-0.8-0.1-1.1-0.3c-0.3-0.2-0.4-0.5-0.4-0.9c0-0.3,0.1-0.7,0.4-0.9&#xa;&#x9;&#x9;c0.3-0.2,0.6-0.3,1.1-0.3h3.8c0.7,0,1.3,0.1,1.6,0.3c0.3,0.2,0.5,0.6,0.5,1v5.6c0,0.5-0.1,0.7-0.3,1c-0.2,0.2-0.5,0.3-0.9,0.3&#xa;&#x9;&#x9;c-0.3,0-0.6-0.1-0.9-0.2c-0.2-0.2-0.4-0.4-0.5-0.7l-0.3-1.1c-0.6,0.7-1.4,1.3-2.2,1.6c-0.8,0.3-1.7,0.5-2.8,0.5&#xa;&#x9;&#x9;c-2.4,0-4.4-0.7-5.8-2.1c-1.5-1.4-2.2-3.3-2.2-5.6s0.7-4.2,2.2-5.6c1.5-1.4,3.5-2.1,5.9-2.1c0.8,0,1.6,0.1,2.2,0.2&#xa;&#x9;&#x9;c0.7,0.1,1.4,0.3,2,0.6c0.9,0.4,1.5,0.8,2,1.3c0.5,0.5,0.7,1,0.7,1.4c0,0.4-0.2,0.7-0.5,1c-0.3,0.3-0.6,0.4-1.1,0.4&#xa;&#x9;&#x9;c-0.4,0-0.7-0.1-1-0.2c-0.3-0.1-0.6-0.4-1-0.8c-0.5-0.5-1-0.9-1.4-1.1c-0.5-0.2-1.1-0.3-1.8-0.3c-1.4,0-2.6,0.5-3.4,1.3&#xa;&#x9;&#x9;c-0.8,0.9-1.2,2.1-1.2,3.7c0,1.6,0.4,2.8,1.3,3.7c0.9,0.9,2.1,1.3,3.5,1.3c1.2,0,2.1-0.3,2.8-0.9C193.5,88.7,193.9,87.8,194.2,86.9&#xa;&#x9;&#x9;z"/>
+          <path class="st2" d="M212.6,86.9H210c-0.5,0-0.8-0.1-1.1-0.3c-0.3-0.2-0.4-0.5-0.4-0.9c0-0.3,0.1-0.7,0.4-0.9&#xa;&#x9;&#x9;c0.3-0.2,0.6-0.3,1.1-0.3h3.8c0.7,0,1.3,0.1,1.6,0.3c0.3,0.2,0.5,0.6,0.5,1v5.6c0,0.5-0.1,0.7-0.3,1c-0.2,0.2-0.5,0.3-1,0.3&#xa;&#x9;&#x9;c-0.3,0-0.6-0.1-0.9-0.2c-0.2-0.2-0.3-0.4-0.5-0.7l-0.3-1.1c-0.6,0.7-1.4,1.3-2.2,1.6c-0.8,0.3-1.8,0.5-2.9,0.5&#xa;&#x9;&#x9;c-2.4,0-4.4-0.7-5.9-2.1c-1.5-1.4-2.2-3.3-2.2-5.6s0.7-4.2,2.2-5.6c1.5-1.4,3.5-2.1,5.9-2.1c0.8,0,1.6,0.1,2.2,0.2&#xa;&#x9;&#x9;c0.7,0.1,1.4,0.3,2,0.6c0.9,0.4,1.5,0.8,2,1.3c0.5,0.5,0.7,1,0.7,1.4c0,0.4-0.1,0.7-0.5,1c-0.3,0.3-0.7,0.4-1.1,0.4&#xa;&#x9;&#x9;c-0.3,0-0.7-0.1-1-0.2c-0.3-0.1-0.6-0.4-1-0.8c-0.5-0.5-0.9-0.9-1.4-1.1c-0.5-0.2-1.1-0.3-1.8-0.3c-1.4,0-2.6,0.5-3.4,1.3&#xa;&#x9;&#x9;c-0.8,0.9-1.2,2.1-1.2,3.7c0,1.6,0.4,2.8,1.3,3.7c0.9,0.9,2,1.3,3.5,1.3c1.1,0,2.1-0.3,2.8-0.9C212,88.7,212.5,87.8,212.6,86.9z"/>
+          <path class="st2" d="M230.5,89.6c0.6,0,1.2,0.1,1.4,0.3c0.3,0.2,0.5,0.6,0.5,1s-0.2,0.7-0.5,1c-0.3,0.2-0.8,0.3-1.4,0.3h-9&#xa;&#x9;&#x9;c-0.8,0-1.4-0.2-1.7-0.5c-0.3-0.3-0.5-0.9-0.5-1.8V80c0-0.9,0.2-1.5,0.5-1.8c0.3-0.3,0.9-0.5,1.7-0.5h8.6c0.6,0,1.1,0.1,1.4,0.3&#xa;&#x9;&#x9;s0.5,0.5,0.5,1c0,0.4-0.2,0.7-0.5,0.9c-0.3,0.2-0.8,0.3-1.4,0.3h-7.2v3.1h6.6c0.6,0,1.1,0.1,1.4,0.3c0.3,0.2,0.5,0.5,0.5,1&#xa;&#x9;&#x9;c0,0.4-0.2,0.7-0.5,0.9c-0.3,0.2-0.8,0.3-1.4,0.3h-6.6v3.7L230.5,89.6L230.5,89.6z"/>
+          <path class="st2" d="M238.4,80.3v3.9h4.1c0.9,0,1.6-0.2,2-0.5c0.4-0.3,0.6-0.8,0.6-1.4c0-0.6-0.2-1.1-0.6-1.4&#xa;&#x9;&#x9;c-0.4-0.3-1-0.5-1.8-0.5H238.4L238.4,80.3z M238.4,90.8c0,0.5-0.1,0.9-0.5,1.2c-0.3,0.3-0.7,0.4-1.3,0.4s-1-0.1-1.3-0.4&#xa;&#x9;&#x9;c-0.3-0.3-0.5-0.7-0.5-1.2V80c0-0.9,0.2-1.5,0.5-1.8c0.3-0.3,0.9-0.5,1.7-0.5h6.2c1.9,0,3.3,0.3,4.1,1c0.9,0.7,1.4,1.7,1.4,3.1&#xa;&#x9;&#x9;c0,0.9-0.2,1.6-0.7,2.2c-0.5,0.6-1.1,1-1.9,1.2c0.6,0.2,1.1,0.5,1.5,0.9c0.3,0.4,0.5,0.9,0.6,1.6c0.1,0.3,0.1,0.6,0.1,1&#xa;&#x9;&#x9;c0,0.5,0.1,0.7,0.1,0.9c0.1,0.2,0.1,0.4,0.2,0.7c0.1,0.3,0.1,0.6,0.1,0.7c0,0.4-0.2,0.7-0.5,1c-0.3,0.2-0.7,0.3-1.3,0.3&#xa;&#x9;&#x9;c-0.7,0-1.3-0.2-1.6-0.5c-0.3-0.3-0.5-1.3-0.6-2.8c-0.1-1.1-0.3-1.9-0.7-2.2c-0.3-0.3-1-0.4-1.9-0.4h-3.7v4.3H238.4z"/>
+        </g>
+        </svg> </div>
+      <div class="claim">The Embedded Experts</div>
+      <div class="head">
+        <div class="container">
+          <h1>Release notes for SEGGER Toolchain</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ****************************************************************** -->
+  <!-- History                                                       -->
+  <!-- ****************************************************************** -->
+  <div class="divider-global">
+    <div class="container">
+      <h2>Release 24. Nov 2021</h2>
+      <div>
+        <h3>Compiler</h3>
+        <p><em>Version 13.0.0</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>
+                  Merged with clang 13.0.0
+                </li>
+                <li>
+                  Minor optimizations improving speed for Thumb-1 targets.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 12.4.0</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>
+                  Optimize handling of constants and global variables (code size and speed).
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 12.2.4</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>Program corrections</b>
+              <ol>
+                <li>
+                  Small bug fix in code generation.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 12.2.1</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>
+                  Several small optimizations improving code size and speed.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 12.0.3</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>Program corrections</b>
+              <ol>
+                <li>
+                  Small bug fixes in code generation.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 12.0.2</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>
+                  Adjust list of known builtin functions with SEGGER runtime library.
+                </li>
+              </ol>
+            </li>
+            <li>
+              <b>Program corrections</b>
+              <ol>
+                <li>
+                  Under rare circumstances invalid code may be generated if optimizing for size. Fixed.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 12.0.0</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>
+                  Merged with clang 12.0.0
+                </li>
+                <li>
+                  Several optimizations improving code size and speed.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 11.4.4</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>Program corrections</b>
+              <ol>
+                <li>
+                  Under rare circumstances a tail call could be malformed. Fixed.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 11.4.0</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>
+                  Merged with clang 11.0.1
+                </li>
+                <li>
+                  Several optimizations improving code size for Cortex-M0, A9, A12, A15 and A17 devices.
+                </li>
+                <li>
+                  Several small optimizations improving speed.
+                </li>
+              </ol>
+            </li>
+            <li>
+              <b>Program corrections</b>
+              <ol>
+                <li>
+                  For some source code lines the debug line information was missing in the output file. Fixed.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 11.2.1</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>Program corrections</b>
+              <ol>
+                <li>
+                  Under certain circumstances incorrect code was generated for Cortex-M7 targets. Fixed.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 11.2.0</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>
+                  Improve inlining:
+                  All functions with large stack called in the same function are either all inlined or none of them are inlined.
+                </li>
+                <li>
+                  Several small optimizations improving code size and speed.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 11.0.3</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>
+                  Functions with large stack requirement are not inlined any more.
+                </li>
+              </ol>
+            </li>
+            <li>
+              <b>Program corrections</b>
+              <ol>
+                <li>
+                  Don't use indirect calls to weak functions to allow the linker to eliminate the call.
+                </li>
+                <li>
+                  Under certain circumstances the spiller could take a wrong register. Fixed.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 11.0.0</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>New features</b>
+              <ol>
+                <li>
+                  Merged with clang-11
+                </li>
+                <li>
+                  Activated function outliner when optimizing for size
+                </li>
+              </ol>
+            </li>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>
+                  Error "anonymous bit-field cannot have qualifiers" was turned into a warning
+                </li>
+                <li>
+                  Many improvements to the code generation and optimization
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 10.6.6</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>New features</b>
+              <ol>
+                <li>
+                  Introduced compiler identification macro __SEGGER_CC__.
+                </li>
+              </ol>
+            </li>
+            <li>
+              <b>Program corrections</b>
+              <ol>
+                <li>
+                  MUL instructions were not coded correctly if inside an IT block, which causes the assembler to break. Fixed.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <h3>Assembler</h3>
+        <p><em>Version 2.10.0</em></p>
+      </div>
+      <div>
+        <h3>Linker</h3>
+        <p><em>Version 4.18.0</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>New features</b>
+              <ol>
+                <li>
+                  The linker script is now subject to preprocessing.  A complete C-like preprocessor
+                  with <code>#define</code>, <code>#if</code>, and <code>#include</code> processing
+                  is integrated into the linker.
+                </li>
+                <li>
+                  Added <code>-I</code> command line option to add directories to the preprocessor include path lookup.
+                </li>
+                <li>
+                  Added <code>-D</code> command line option to define preprocessor symbols on the command line.
+                </li>
+              </ol>
+            </li>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>
+                  Undefined symbol error messages now indicate the symbol, section, and file name
+                  of the source reference.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 4.16.1</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>
+                  Veneers were sometimes constructed even though unnecessary leading to suboptimal
+                  code; now veneers only constructed when absolutely required (Arm).
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 4.16.0</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>
+                  Support relocation <code>R_RISCV_SET16</code> (RISC-V).
+                </li>
+                <li>
+                  Support relocation <code>R_RISCV_ADD16</code> and <code>R_RISCV_SUB16</code> (RISC-V).
+                </li>
+                <li>
+                  Support relocation <code>R_RISCV_ADD8</code> and <code>R_RISCV_SUB8</code> (RISC-V).
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 4.14.0</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>
+                  Support relocation <code>R_ARM_THM_ALU_PREL_11_0</code> in Arm linker.
+                </li>
+                <li>
+                  Support relocation <code>R_RISCV_PCREL_LO12_S</code> in RISC-V linker.
+                </li>
+                <li>
+                  Support Andes-specific relocations in RISC-V linker.
+                </li>
+              </ol>
+            </li>
+            <li>
+              <b>Program corrections</b>
+              <ol>
+                <li>
+                  Avoid crash in disassembler when listing some RVP instructions in RISC-V linker.
+                </li>
+                <li>
+                  Initialization of data sections greater than 32k with LZSS compression could be wrong. Fixed.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 4.12.1</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>Program corrections</b>
+              <ol>
+                <li>
+                  Fix warning issued for veneered call to function in absolute section.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 4.12.0</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>
+                  Enable linking of functions declared to be absolute.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 4.10.1</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>
+                  Support architecture names <code>8.1-M.main</code> and <code>8.1-M.base</code>.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 4.10.0</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>New features</b>
+              <ol>
+                <li>
+                  Added <code>define access</code> statement.
+                </li>
+                <li>
+                  Added support for keeping sections by name, controlled by <code>--keep-section</code> option.
+                </li>
+                <li>
+                  Added support for conditionally keeping initialization arrays, controlled by <code>--keep-init-array</code> option.
+                </li>
+              </ol>
+            </li>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>
+                  Support <code>R_RISCV_32_PCREL</code> relocation in RISC-V linker.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 4.8.0</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>New features</b>
+              <ol>
+                <li>
+                  Added support for Andes Performance Extension controlled by <code>--andes-performance-extension</code> and <code>--no-andes-performance-extension</code> options.
+                </li>
+                <li>
+                  Added support for Huawei custom extension by <code>--huawei-extension</code> and <code>--no-huawei-extension</code> options.
+                </li>
+              </ol>
+            </li>
+            <li>
+              <b>Program corrections</b>
+              <ol>
+                <li>
+                  Fix missing end-table tag on HTML section detail output.
+                </li>
+                <li>
+                  Fix generation of error message when calling undefined weak symbols in A32 code.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 4.6.0</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>New features</b>
+              <ol>
+                <li>
+                  Added support for AndeStar CoDense code compression controlled by <code>--instruction-tables</code> and <code>--no-instruction-tables</code> options.
+                </li>
+                <li>
+                  Added "unused input file" map section controlled by <code>--map-unused-inputs</code> and <code>--no-map-unused-inputs</code> options.
+                </li>
+                <li>
+                  Added "unused memory ranges" map section controlled by <code>--map-unused-memory</code> and <code>--no-map-unused-memory</code> options.
+                </li>
+              </ol>
+            </li>
+            <li>
+              <b>Program changes</b>
+              <ol>
+                <li>
+                  String merging is unavailable on Arm targets.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 4.4.1</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>New features</b>
+              <ol>
+                <li>
+                  Added code outlining parameterization controlled by <code>--outline-strand-size</code> option.
+                </li>
+                <li>
+                  Added <code>option</code> statement to linker script language.
+                </li>
+              </ol>
+            </li>
+            <li>
+              <b>Program corrections</b>
+              <ol>
+                <li>
+                  Prevent error if <code>--keep</code> command line switch specifies a non-existent symbol.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 4.4.0</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>New features</b>
+              <ol>
+                <li>
+                  Added code outlining capability controlled by <code>--outline</code> and <code>--no-outline</code> options.
+                </li>
+                <li>
+                  Added tail merging capability controlled by <code>--tail-merge</code> and <code>--no-tail-merge</code> options.
+                </li>
+              </ol>
+            </li>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>
+                  If the linker-created initialization table is not referenced in the startup code,
+                  it is not included in the linked application.
+                </li>
+              </ol>
+            </li>
+            <li>
+              <b>Program corrections</b>
+              <ol>
+                <li>
+                  String merging could inadvertently evict required initialization array sections. Fixed.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 4.2.1</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>
+                  Required non-allocatable sections are silently converted to allocatable
+                  sections rather than eliciting a warning.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 4.2.0</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>New features</b>
+              <ol>
+                <li>
+                  Added section merging capability controlled by <code>--merge-sections</code> and <code>--no-merge-sections</code> options.
+                </li>
+              </ol>
+            </li>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>
+                  Linker-created data is now itemized in the Module Summary section.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 4.0.1</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>New features</b>
+              <ol>
+                <li>
+                  Architecture mismatch detection and warning controlled by <code>--warn-arch-mismatch</code> and <code>--no-warn-arch-mismatch</code> options.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 4.0.0</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>New features</b>
+              <ol>
+                <li>
+                  Added support for RISC-V processors.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 3.20.5</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>
+                  Unconditionally generate region symbols when requested, rather than
+                  generating only the region symbols used by the linked application.
+                  This enables the Embedded Studio IDE to display firmware regions in the
+                  Output and Memory Use windows.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 3.20.4</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>New features</b>
+              <ol>
+                <li>
+                  Added <code>--warn-deprecated</code> and <code>--no-warn-deprecated</code> to advise of scheduled changes.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 3.20.2</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>New features</b>
+              <ol>
+                <li>
+                  Added <code>assert</code> statement.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 3.20.0</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>New features</b>
+              <ol>
+                <li>
+                  Detection of unintended/any use of "double" AEABI functions controlled by <code>--warn-all-double</code>, <code>--warn-unintended-double</code>, and <code>--no-warn-double</code>.
+                </li>
+                <li>
+                  Demand-load of appropriate archives controlled by <code>--lazy-load-archives</code> and <code>--no-lazy-load-archives</code> which can improve linker performance with very large archives (> 20 MB).
+                </li>
+                <li>
+                  Optimization of C++ exception handling tables controlled by <code>--optimize-exception-table</code> and <code>--no-optimize-exception-table</code>.
+                </li>
+                <li>
+                  Demangling of C++ names in the map file and diagnostic messages controlled by <code>--pretty-symbol-names</code>, <code>--no-pretty-symbol-names</code>, <code>--pretty-section-names</code>, and <code>--no-pretty-section-names</code>.
+                </li>
+                <li>
+                  Address and size formats in the map file controlled by <code>--map-addr-format</code> and <code>--map-size-format</code>.
+                </li>
+                <li>
+                  Wrapping or truncation of excessive-width columns in the map file controlled by <code>--map-wrap</code> and <code>--no-map-wrap</code>.
+                </li>
+                <li>
+                  Inclusion of exception table section in map file controlled by <code>--map-exception-table</code> and <code>--no-map-exception-table</code>.
+                </li>
+                <li>
+                  Control of per-section cross reference in the map file absolute listing controlled by <code>--map-listing-xref</code> and <code>--no-map-listing-xref</code>.
+                </li>
+                <li>
+                  Added <code>--big-endian</code> and <code>--little-endian</code> with support to link big-endian images.
+                </li>
+              </ol>
+            </li>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>
+                  Lists of sections and/or symbols are always ordered by symbol name or symbol address if only one one sort criterion makes sense.
+                </li>
+                <li>
+                  Lists of sections and values are always ordered by symbol/section name and then value, or by value and then symbol/section name to enforce a consistent sort order.
+                </li>
+                <li>
+                  Linker-created symbols are shown in symbol lists only if they are used in order to avoid clutter.
+                </li>
+                <li>
+                  Initialization table section is expanded with a better presentation.
+                </li>
+                <li>
+                  Module summary section now breaks out input object files and input object archives for a better summary presentation.
+                </li>
+                <li>
+                  Linker modified to process <code>R_ARM_TARGET2</code> relocations identically to the GNU linker.  This is in conflict with the handling of <code>R_ARM_TARGET2</code> defined by the document "ELF for the Arm Architecture", ARM Limited, but is required to make C++ exception handling work with the existing GCC, clang, and libunwind framework.  Only use with the GNU and clang toolsets is guaranteed and tested to work with this change.
+                </li>
+                <li>
+                  Creation of synthetic output sections for fixed-size blocks created in the linker script that combine no sections (e.g. stack and heap blocks).  This assists Embedded Studio to display memory usage after build, or in the Memory Usage window, accurately.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <h3>Runtime</h3>
+        <p><em>Version 2.30.0</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>New features</b>
+              <ol>
+                <li>
+                  Added support for half-precision floating point.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 2.28.2</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>New features</b>
+              <ol>
+                <li>
+                  Added <code>sincos()</code>, <code>sincosf()</code>, <code>sincosl()</code>.
+                </li>
+                <li>
+                  Added support for <code>long double</code> I/O of 128-bit floating values
+                  using '<code>%Lf</code>' and similar format specifiers (RISC-V).
+                </li>
+                <li>
+                  Added <code>__SEGGER_RTL_NO_BUILTIN</code> to poison certain compiler
+                  transformations that are invalid when compiling the runtime library at
+                  high optimization levels.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 2.28.1</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>Corrections</b>
+              <ol>
+                <li>
+                  Align <code>prinops.c</code> and <code>wprinops.c</code> selection of formatting
+                  features and avoid compilation error when floating output is excluded from the build.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 2.28.0</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>New features</b>
+              <ol>
+                <li>
+                  Upgraded to emFloat 2.8.0.
+                </li>
+                <li>
+                  Added implementation of <code>__popcountsi2()</code> and <code>__popcountdi2()</code>.
+                </li>
+                <li>
+                  Added implementation of <code>__paritysi2()</code> and <code>__paritydi2()</code>.
+                </li>
+                <li>
+                  Added balanced <code>long long</code> division algorithm for v4T and v7A (ARM).
+                </li>
+                <li>
+                  Added size-optimized <code>long long</code> division algorithm for v4T and v7A (ARM).
+                </li>
+              </ol>
+            </li>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>
+                  Improved 64-bit multiplication speed for v6M/v8M (ARM).
+                </li>
+                <li>
+                  Improved 64-bit division speed for v6M (ARM).
+                </li>
+                <li>
+                  Improved 64-bit division speed for v4T and v5TE (ARM).
+                </li>
+                <li>
+                  Improved 32-bit and 64-bit multiplication speed for cores that lack M extension (RISC-V).
+                </li>
+                <li>
+                  Improved signed and unsigned 64-bit division speed for v8M.Baseline by utilizing integer divide instruction (ARM).
+                </li>
+                <li>
+                  Improved integer division speed for cores that have M extension but lack a divider (RISC-V).
+                </li>
+                <li>
+                  Improved <code>long long</code> to <code>double</code> conversion for D extension (RISC-V).
+                </li>
+                <li>
+                  Improved <code>unsigned long long</code> to <code>double</code> conversion for D extension (RISC-V).
+                </li>
+                <li>
+                  Improved <code>__unordsf2()</code> and <code>__unorddf2()</code> for F and D extensions (RISC-V).
+                </li>
+                <li>
+                  Improved scaled-integer <code>tanf()</code> size and speed using M&#246;ller-Granlund division.
+                </li>
+                <li>
+                  Improved generic floating divide using M&#246;ller-Granlund division.
+                </li>
+                <li>
+                  Improved floating-point to integer conversions to use floating point instructions where possible for F and D extensions (RISC-V).
+                </li>
+                <li>
+                  Improved floating-point to integer conversions to use fast and configurable integer normalization (RISC-V).
+                </li>
+                <li>
+                  Sample configuration file no longer relies on builtins for <tt>fabs()</tt> and <tt>fabsf()</tt> (RISC-V).
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 2.26.1</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>
+                  Further simplified I/O implementation examples.
+                </li>
+              </ol>
+            </li>
+            <li>
+              <b>Corrections</b>
+              <ol>
+                <li>
+                  Activated <code>MLS</code> instruction for architectures v7 and later (Arm).
+                </li>
+                <li>
+                  Corrected definition of <code>strlen(x)</code> macro in example configuration (RISC-V).
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 2.26.0</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>New features</b>
+              <ol>
+                <li>
+                  Added <code>&lt;fenv.h></code> and corresponding floating-point environment functions.
+                </li>
+              </ol>
+            </li>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>
+                  Added detection and configuration for SIMD extension (RISC-V).
+                </li>
+                <li>
+                  Added detection and configuration for bit manipulation extension (RISC-V).
+                </li>
+                <li>
+                  Added detection and configuration for Andes Performance Extension (RISC-V).
+                </li>
+                <li>
+                  All floating-point functions automatically adapt for balanced performance on typical RISC-V devices.
+                </li>
+                <li>
+                  Faster floating-point arithmetic and conversions when SIMD extension present (RISC-V).
+                </li>
+                <li>
+                  Faster floating-point arithmetic and conversions when bit manipulation extension present (RISC-V).
+                </li>
+                <li>
+                  Faster floating-point arithmetic and conversions when Andes Performance extension present (RISC-V).
+                </li>
+                <li>
+                  Faster floating-point arithmetic for base RISC-V ISA when multiplier is present (RV32E).
+                </li>
+                <li>
+                  Faster 64-bit division for architectures lacking divide instructions (Arm).
+                </li>
+                <li>
+                  Small revisions of floating-point functions leading to smaller and faster code (Arm).
+                </li>
+                <li>
+                  Further optimized <code>strlen()</code>, <code>strcmp()</code>, <code>strcpy()</code>, and <code>strchr()</code> when configured for more speed (Arm).
+                </li>
+                <li>
+                  Further optimized <code>strlen()</code>, <code>strcmp()</code>, <code>strcpy()</code>, and <code>strchr()</code> when configured for more speed (RISC-V).
+                </li>
+                <li>
+                  Revision of I/O framework for easier customer configuration.
+                </li>
+              </ol>
+            </li>
+            <li>
+              <b>Program corrections</b>
+              <ol>
+                <li>
+                  Corrected <code>__aeabi_dcmpun()</code> (Arm).
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 2.24.0</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>New features</b>
+              <ol>
+                <li>
+                  Added <code>strtold()</code>.
+                </li>
+              </ol>
+            </li>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>
+                  Faster double to integer conversion when FPU supports IEEE double.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 2.22.0</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>
+                  Optimized <code>strlen()</code>, <code>strcmp()</code>, and <code>strchr()</code> when configured for more speed (Arm).
+                </li>
+                <li>
+                  Optimized <code>strlen()</code>, <code>strcmp()</code>, and <code>strchr()</code> when configured for more speed (RISC-V).
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 2.20.0</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>New features</b>
+              <ol>
+                <li>
+                  Supply full set of functions for emulated 128-bit <code>long</code> <code>double</code> on RISC-V.
+                </li>
+                <li>
+                  Use fast <code>memcpy()</code> and fast <code>memset()</code> in balanced mode (Arm).
+                </li>
+                <li>
+                  Use fast <code>strcpy()</code> and fast <code>strcmp()</code> in balanced mode (RISC-V).
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+        <p><em>Version 2.4.2</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>Program corrections</b>
+              <ol>
+                <li>
+                  Fix corruption of register <code>r3</code> for <code>__aeabi_ldivmod()</code> and <code>__aeabi_uldivmod()</code> on Thumb builds for v4T architecture.
+                </li>
+                <li>
+                  Correct highly infrequent misrounding (by 1 ulp) of single-precision quotient on architectures that have no fast divide but do have fast multiply.
+                </li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--
+  <div class="divider-global">
+    <div class="container">
+      <h2>Release DD. MMM YYYY</h2>
+      <div>
+        <h3>Compiler</h3>
+        <p><em>Version 10.6.6</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>New Features</b>
+              <ol>
+                <li>...</li>
+              </ol>
+            </li>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>...</li>
+              </ol>
+            </li>
+            <li>
+              <b>Program corrections</b>
+              <ol>
+                <li>...</li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <h3>Assembler</h3>
+        <p><em>Version 2.10.0</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>New features</b>
+              <ol>
+                <li>...</li>
+              </ol>
+            </li>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>...</li>
+              </ol>
+            </li>
+            <li>
+              <b>Program corrections</b>
+              <ol>
+                <li>...</li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <h3>Linker</h3>
+        <p><em>Version 3.20.0</em></p>
+        <div>
+          <ul>
+            <li>
+              <b>New features</b>
+              <ol>
+                <li>...</li>
+              </ol>
+            </li>
+            <li>
+              <b>Improvements</b>
+              <ol>
+                <li>...</li>
+              </ol>
+            </li>
+            <li>
+              <b>Program corrections</b>
+              <ol>
+                <li>...</li>
+              </ol>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  -->
+  <div class="divider-global">
+    <div class="container">
+      <p>This document was first released with SEGGER Toolchain on 09. Oct 2020</p>
+    </div>
+  </div>
+
+  <!-- ****************************************************************** -->
+  <!-- Known problems/limitations                                         -->
+  <!-- ****************************************************************** -->
+  <!--<div class="divider-global">                                        -->
+  <!--  <div class="container">                                           -->
+  <!--    <h2>Known problems/limitations</h2>                             -->
+  <!--    <div>                                                           -->
+  <!--      <ol>                                                          -->
+  <!--        <li>.</li>                                                  -->
+  <!--      </ol>                                                         -->
+  <!--    </div>                                                          -->
+  <!--  </div>                                                            -->
+  <!--</div>                                                              -->
+
+</main>
+<div class="footer">
+  <div class="container">
+    <div>
+      <p>Copyright 2019-2021 SEGGER Microcontroller GmbH. All rights reserved.<br/>
+        For more information, please visit our website&nbsp;<a target="_blank" href="https://www.segger.com/">www.segger.com</a>&nbsp;or contact us at&nbsp;<a href="mailto:info@segger.com">info@segger.com</a>&nbsp;</p>
+    </div>
+  </div>
+</div>
+ 
+    </div>
+  </body>
+</html>
